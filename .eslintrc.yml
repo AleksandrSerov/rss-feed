@@ -1,12 +1,12 @@
 ---
 plugins:
   - babel
-  # - jest
+  - jest
 
 env:
   node: true
   browser: true
-  # jest: true
+  jest: true
 
 parser: babel-eslint
 
