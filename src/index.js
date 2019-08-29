@@ -6,12 +6,14 @@ import parse from './parse';
 import builder from './builder';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
-let xml = null;
 
 let state = {
   query: null,
   isValidQuery: false,
 };
+
+const cards = document.querySelector('#cardsList');
+const articles = document.querySelector('#articlesList');
 
 const validateSearchInput = (input) => {
   const { isValidQuery } = state;
@@ -32,6 +34,11 @@ const setState = (params) => {
 };
 
 const app = () => {
+  setState({
+    query: 'http://www.habrahabr.ru/rss/main/',
+    isValidQuery: true,
+  });
+
   const input = document.getElementById('formInput');
   input.addEventListener('input', (e) => {
     setState({
@@ -46,19 +53,18 @@ const app = () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const { query, isValidQuery } = state;
-
-    if (isValidQuery) {
-      const response = axios.get(`${corsURL}/${query}`);
-      response.then((data) => {
-        xml = data.data;
-        const parsed = parse(xml);
-        const { card, articlesList } = builder(parsed);
-        const cards = document.querySelector('#cardsList');
-        const articles = document.querySelector('#articlesList');
-        cards.append(card);
-        articles.append(articlesList);
-      });
+    if (!isValidQuery) {
+      console.error('Query not valid!');
+      return;
     }
+
+    axios.get(`${corsURL}/${query}`).then(({ data }) => {
+      const parsed = parse(data);
+
+      const { card, articlesList } = builder(parsed);
+      cards.append(card);
+      articles.append(articlesList);
+    });
   });
 };
 

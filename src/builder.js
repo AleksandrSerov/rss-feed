@@ -1,57 +1,62 @@
-const cardTemplate = () => {
-  const card = document.createElement('div');
-  card.classList.add('card', 'mb-1');
-  card.style.width = '18rem';
-  const cardBody = document.createElement('div');
-  cardBody.classList.add('card-body');
-  const cardTitle = document.createElement('h5');
-  cardTitle.innerHTML = 'Default';
-  cardTitle.classList.add('card-title');
-  const cardText = document.createElement('p');
-  cardText.classList.add('card-text');
-  cardText.innerHTML = 'Lorem ipsum, dolor sit amet consectetur elit.';
-  const cardButton = document.createElement('a');
-  cardButton.classList.add('btn', 'btn-primary');
-  cardButton.href = '#';
-  cardButton.innerHTML = 'Read';
-
-  cardBody.append(cardTitle, cardText, cardButton);
-  card.append(cardBody);
-
-  return card;
+const htmlToElement = (html) => {
+  const template = document.createElement('template');
+  template.innerHTML = html.trim();
+  return template.content.firstChild;
 };
 
-const articleTemplate = () => {
-  const article = document.createElement('a');
-  article.href = '#';
-  article.classList.add('list-group-item', 'list-group-item-action');
-  article.innerHTML = 'Default';
+const getCardHTML = (props) => {
+  const { title, text, href = '#' } = props;
+  const html = `
+  <div class="card mb-1" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">${title}</h5>
+      <p class="card-text">${text}</p>
+      <a class="btn btn-primary" href="${href}">Read</a>
+    </div>
+  </div>
+  `;
 
-  return article;
+  return html;
 };
 
 const buildCard = (data) => {
-  const title = data.querySelector('title');
-  const description = data.querySelector('description');
-  const card = cardTemplate();
-  const cardTitle = card.querySelector('.card-title');
-  const cardText = card.querySelector('.card-text');
-  cardTitle.innerHTML = title.innerHTML;
-  cardText.innerHTML = description.innerHTML;
-  return card;
+  const title = data.querySelector('title').innerHTML;
+  const text = data.querySelector('description').innerHTML;
+  const html = getCardHTML({ title, text });
+  return htmlToElement(html);
+};
+
+const getArticleHTML = (props) => {
+  const { href, text } = props;
+  const html = `
+  <a class="list-group-item list-group-item-action" href="${href}">${text}</a>
+  `;
+
+  return html;
+};
+
+const getArticlesListHTML = (articles) => {
+  const html = `
+  <div class="list-group">
+    ${[...articles]
+      .map((article) => {
+        const text = article.querySelector('title').firstChild.data;
+        const href = article.querySelector('link').innerHTML;
+
+        return getArticleHTML({ href, text });
+      })
+      .join('')}
+  </div>
+  `;
+
+  return html;
 };
 
 const buildArticlesList = (data) => {
   const articles = data.querySelectorAll('item');
-  const list = document.createElement('div');
-  list.classList.add('list-group');
-  articles.forEach((article) => {
-    const resultArticle = articleTemplate();
-    resultArticle.innerHTML = article.querySelector('title').firstChild.data;
-    resultArticle.href = article.querySelector('link').innerHTML;
-    list.append(resultArticle);
-  });
-  return list;
+  const html = getArticlesListHTML(articles);
+
+  return htmlToElement(html);
 };
 
 const builder = (data) => {
