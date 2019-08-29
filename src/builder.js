@@ -21,7 +21,7 @@ const getCardHTML = (props) => {
 
 const buildCard = (data) => {
   const title = data.querySelector('title').innerHTML;
-  const text = data.querySelector('description').innerHTML;
+  const text = data.querySelector('description').firstChild.data;
   const html = getCardHTML({ title, text });
   return htmlToElement(html);
 };
@@ -60,6 +60,7 @@ const buildArticlesList = (data) => {
 };
 
 const builder = (data) => {
+  console.log(data);
   const card = buildCard(data);
   const articlesList = buildArticlesList(data);
   return {
