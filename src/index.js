@@ -2,18 +2,13 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import isURL from 'validator/lib/isURL';
 import axios from 'axios';
+import { watch } from 'melanke-watchjs';
 import parse from './parse';
 import builder from './builder';
+import state from './state';
+import render from './render';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
-
-let state = {
-  query: null,
-  isValidQuery: false,
-};
-
-const cards = document.querySelector('#cardsList');
-const articles = document.querySelector('#articlesList');
 
 const validateSearchInput = (input) => {
   const { isValidQuery } = state;
@@ -26,17 +21,24 @@ const validateSearchInput = (input) => {
   input.classList.add('border-danger');
 };
 
-const setState = (params) => {
-  state = {
-    ...state,
-    ...params,
-  };
+const setState = (props) => {
+  Object.keys(props).forEach((key) => {
+    state[key] = props[key];
+  });
 };
 
-const app = () => {
+const setInitialState = () => {
   setState({
     query: 'http://www.habrahabr.ru/rss/main/',
     isValidQuery: true,
+  });
+};
+
+const app = () => {
+  setInitialState();
+  watch(state, 'isFetching', () => {
+    console.log(state.isFetching);
+    render(state);
   });
 
   const input = document.getElementById('formInput');
@@ -45,13 +47,16 @@ const app = () => {
       query: e.target.value,
       isValidQuery: isURL(e.target.value),
     });
-
+    console.log(state);
     validateSearchInput(input);
   });
 
   const form = document.getElementById('mainForm');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    setState({
+      isFetching: true,
+    });
     const { query, isValidQuery } = state;
     if (!isValidQuery) {
       console.error('Query not valid!');
@@ -59,13 +64,12 @@ const app = () => {
     }
 
     axios.get(`${corsURL}/${query}`).then(({ data }) => {
-      const parsed = parse(data);
-
-      const { card, articlesList } = builder(parsed);
-      cards.innerHTML = '';
-      cards.append(card);
-      articles.innerHTML = '';
-      articles.append(articlesList);
+      const { card, articlesList } = builder(parse(data));
+      setState({
+        isFetching: false,
+        articlesList,
+        card,
+      });
     });
   });
 };
