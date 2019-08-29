@@ -60,7 +60,6 @@ const buildArticlesList = (data) => {
 };
 
 const builder = (data) => {
-  console.log(data);
   const card = buildCard(data);
   const articlesList = buildArticlesList(data);
   return {

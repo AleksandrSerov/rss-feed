@@ -62,7 +62,9 @@ const app = () => {
       const parsed = parse(data);
 
       const { card, articlesList } = builder(parsed);
+      cards.innerHTML = '';
       cards.append(card);
+      articles.innerHTML = '';
       articles.append(articlesList);
     });
   });
