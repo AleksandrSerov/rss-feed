@@ -4,16 +4,37 @@
     <title>Hexlet-project-lvl2</title>
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <div class="jumbotron">
-            <form>
-              <div class="form-group">
-                <input class="form-control" id="exampleInput" placeholder="" />
+    <nav class="navbar  navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">RSS Reader</a>
+      <form class="form-inline col" id="mainForm">
+        <div class="input-group col">
+          <input
+            class="form-control border-right-0 "
+            placeholder="Enter RSS link"
+            id="formInput"
+            value="http://www.habrahabr.ru/rss/main/"
+          />
+          <button class="btn btn-primary border-left-0" type="submit">
+            Read
+          </button>
+        </div>
+      </form>
+    </nav>
+    <div class="feed mt-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-4">
+            <h2>Channel</h2>
+            <div class="row">
+              <div class="cards" id="cardsList"></div>
+            </div>
+          </div>
+          <div class="col-8">
+            <h2>Articles</h2>
+            <div class="row">
+              <div class="articles col" id="articlesList"></div>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
