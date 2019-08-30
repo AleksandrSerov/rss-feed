@@ -23,7 +23,7 @@ const typesStates = [
   },
   {
     type: 'invalid',
-    check: () => !state.isValidQuery,
+    check: () => !state.isValidQuery || state.queryList.includes(state.query),
   },
   {
     type: 'valid',
@@ -45,6 +45,7 @@ const formStates = {
     });
     searchButton.disabled = false;
     searchButton.innerHTML = 'Read';
+    render();
   },
   loading: () => {
     searchButton.disabled = true;
@@ -104,6 +105,7 @@ const app = () => {
       const { data } = response;
       setState({
         isFetching: false,
+        queryList: [...state.queryList, query],
       });
       const parsed = parse(data);
 

@@ -1,6 +1,7 @@
 export const state = {
   processState: null,
   query: null,
+  queryList: [],
   isValidQuery: false,
   isFetching: false,
   isError: false,
