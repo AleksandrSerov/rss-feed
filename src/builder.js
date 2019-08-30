@@ -1,11 +1,15 @@
+import { state, setState } from './state';
+
 const htmlToElement = (html) => {
   const template = document.createElement('template');
   template.innerHTML = html.trim();
   return template.content.firstChild;
 };
 
-const getCardHTML = (props) => {
-  const { title, text, href = '#' } = props;
+const getCard = (data) => {
+  const title = data.querySelector('title').innerHTML;
+  const text = data.querySelector('description').firstChild.data;
+  const href = data.querySelector('link').innerHTML;
   const html = `
   <div class="card mb-1" style="width: 18rem;">
     <div class="card-body">
@@ -16,18 +20,12 @@ const getCardHTML = (props) => {
   </div>
   `;
 
-  return html;
-};
-
-const buildCard = (data) => {
-  const title = data.querySelector('title').innerHTML;
-  const text = data.querySelector('description').firstChild.data;
-  const html = getCardHTML({ title, text });
   return htmlToElement(html);
 };
 
-const getArticleHTML = (props) => {
-  const { href, text } = props;
+const getArticleHTML = (data) => {
+  const text = data.querySelector('title').firstChild.data;
+  const href = data.querySelector('link').innerHTML;
   const html = `
   <a class="list-group-item list-group-item-action" href="${href}">${text}</a>
   `;
@@ -35,34 +33,24 @@ const getArticleHTML = (props) => {
   return html;
 };
 
-const getArticlesListHTML = (articles) => {
+const getArticlesList = (data) => {
+  const articles = data.querySelectorAll('item');
   const html = `
   <div class="list-group">
-    ${[...articles]
-      .map((article) => {
-        const text = article.querySelector('title').firstChild.data;
-        const href = article.querySelector('link').innerHTML;
-
-        return getArticleHTML({ href, text });
-      })
-      .join('')}
+    ${[...articles].map(getArticleHTML).join('')}
   </div>
   `;
-
-  return html;
-};
-
-const buildArticlesList = (data) => {
-  const articles = data.querySelectorAll('item');
-  const html = getArticlesListHTML(articles);
 
   return htmlToElement(html);
 };
 
 const builder = (data) => {
-  console.log(data);
-  const card = buildCard(data);
-  const articlesList = buildArticlesList(data);
+  const card = getCard(data);
+  const articlesList = getArticlesList(data);
+  setState({
+    channels: [...state.channels, card],
+    articles: [...state.articles, articlesList],
+  });
   return {
     card,
     articlesList,
