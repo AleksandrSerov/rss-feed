@@ -60,17 +60,9 @@ const getArticleDescriptionModal = (data) => {
   `;
 
   const dom = htmlToElement(html);
-  const modal = dom.querySelector('.modal');
-  $(dom).click(() => {
-    setState({
-      activeArticleDescriptionId: modal,
-    });
-  });
 
   $(dom).on('hidde.bs.modal', () => {
-    setState({
-      activeArticleDescriptionId: null,
-    });
+    $(dom).modal('hide');
   });
   return dom;
 };
@@ -90,14 +82,11 @@ const getArticle = (data) => {
   `;
   const dom = htmlToElement(html);
   const element = dom.querySelector('.article-item');
-  element.addEventListener('click', (e) => {
-    e.preventDefault();
-    setState({
-      activeArticleDescriptionId: modal,
-    });
+  $(element).click(() => {
+    $(modal).modal('show');
   });
-  dom.append(modal);
 
+  dom.append(modal);
   return dom;
 };
 

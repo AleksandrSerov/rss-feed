@@ -14,11 +14,6 @@ export const renderChannels = () => {
   channelsById.forEach((id) => cards.append(channels[id]));
 };
 
-export const renderModal = () => {
-  const { activeArticleDescriptionId } = state;
-  $(activeArticleDescriptionId).modal('toggle');
-};
-
 export const render = () => {
   renderChannels();
   renderArticlesList();

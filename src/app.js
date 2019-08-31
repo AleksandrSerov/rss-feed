@@ -4,7 +4,7 @@ import { watch } from 'melanke-watchjs';
 import { state, setState } from './state';
 import build from './builder';
 import parse from './parse';
-import { render, renderArticlesList, renderModal } from './renders';
+import { render, renderArticlesList } from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 
@@ -113,9 +113,6 @@ const app = () => {
 
   watch(state, 'activeArticlesList', () => {
     renderArticlesList();
-  });
-  watch(state, 'activeArticleDescriptionId', () => {
-    renderModal();
   });
 
   setState({ processState: 'init' });
