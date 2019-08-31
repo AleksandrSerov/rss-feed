@@ -1,14 +1,26 @@
+import $ from 'jquery';
 import { state } from './state';
 
 const cards = document.getElementById('cardsList');
-const articlesList = document.getElementById('articlesList');
+const articlesList = document.getElementById('articlesLists');
+export const renderArticlesList = () => {
+  const { activeArticlesList } = state;
+  articlesList.innerHTML = '';
+  articlesList.append(activeArticlesList);
+};
 
-export default () => {
-  const { channels, articles } = state;
-  channels.forEach((channel) => {
-    cards.append(channel);
-  });
-  articles.forEach((article) => {
-    articlesList.append(article);
-  });
+export const renderChannels = () => {
+  const { channelsById, channels } = state;
+  channelsById.forEach((id) => cards.append(channels[id]));
+};
+
+export const renderModal = () => {
+  const { activeArticleDescriptionId } = state;
+  console.log(activeArticleDescriptionId);
+  $(activeArticleDescriptionId).modal('toggle');
+};
+
+export const render = () => {
+  renderChannels();
+  renderArticlesList();
 };

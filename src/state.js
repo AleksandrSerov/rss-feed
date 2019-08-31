@@ -1,12 +1,18 @@
 export const state = {
-  processState: null,
-  query: null,
+  processState: 'init',
+  query: 'http://www.habrahabr.ru/rss/main/',
   queryList: [],
-  isValidQuery: false,
+  isValidQuery: true,
   isFetching: false,
   isError: false,
-  channels: [],
-  articles: [],
+  channels: {},
+  channelsById: [],
+  articles: {},
+  articlesById: [],
+  activeArticlesList: [],
+  articlesDescription: {},
+  articlesDescriptionById: [],
+  activeArticleDescriptionId: null,
 };
 
 export const setState = (params) => {

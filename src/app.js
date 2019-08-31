@@ -2,9 +2,9 @@ import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 import { watch } from 'melanke-watchjs';
 import { state, setState } from './state';
-import builder from './builder';
+import build from './builder';
 import parse from './parse';
-import render from './renders';
+import { render, renderArticlesList, renderModal } from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 
@@ -45,7 +45,6 @@ const formStates = {
     });
     searchButton.disabled = false;
     searchButton.innerHTML = 'Read';
-    render();
   },
   loading: () => {
     searchButton.disabled = true;
@@ -67,51 +66,67 @@ const formStates = {
   },
 };
 
-const app = () => {
-  watch(state, 'processState', () => {
-    const { processState } = state;
-    formStates[processState]();
+const handleInput = (value) => {
+  setState({
+    query: value,
+    isValidQuery: isURL(value),
+  });
+};
+
+const handleSubmit = () => {
+  const { query, queryList } = state;
+  setState({
+    isFetching: true,
   });
 
-  watch(state, () => {
+  const url = `${corsURL}/${query}`;
+
+  axios.get(url).then((response) => {
+    const { data } = response;
+    const parsed = parse(data);
+    input.value = '';
+
+    build(parsed);
+    setState({
+      isFetching: false,
+      queryList: [...queryList, query],
+      query: '',
+      activeArticlesList: state.activeArticlesList.length
+        ? state.activeArticlesList
+        : state.articles[state.articlesById[0]],
+    });
+  });
+};
+
+const app = () => {
+  watch(state, ['query', 'isValidQuery', 'isFetching'], () => {
     setState({
       processState: getTypeState(),
     });
   });
 
+  watch(state, 'processState', () => {
+    const { processState } = state;
+    formStates[processState]();
+    render();
+  });
+
+  watch(state, 'activeArticlesList', () => {
+    renderArticlesList();
+  });
+  watch(state, 'activeArticleDescriptionId', () => {
+    renderModal();
+  });
+
   setState({ processState: 'init' });
 
   input.addEventListener('input', (e) => {
-    const { value } = e.target;
-
-    setState({
-      query: value,
-      isValidQuery: isURL(value),
-    });
-    if (!state.isValidQuery) {
-      state.processState = 'invalid';
-    }
+    handleInput(e.target.value);
   });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    setState({
-      isFetching: true,
-    });
-
-    const { query } = state;
-
-    axios.get(`${corsURL}/${query}`).then((response) => {
-      const { data } = response;
-      setState({
-        isFetching: false,
-        queryList: [...state.queryList, query],
-      });
-      const parsed = parse(data);
-
-      builder(parsed);
-      render();
-    });
+    handleSubmit();
   });
 };
 
