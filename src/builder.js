@@ -68,7 +68,6 @@ const getArticleDescriptionModal = (data) => {
   });
 
   $(dom).on('hidde.bs.modal', () => {
-    console.log('here');
     setState({
       activeArticleDescriptionId: null,
     });

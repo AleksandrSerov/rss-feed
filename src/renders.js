@@ -16,7 +16,6 @@ export const renderChannels = () => {
 
 export const renderModal = () => {
   const { activeArticleDescriptionId } = state;
-  console.log(activeArticleDescriptionId);
   $(activeArticleDescriptionId).modal('toggle');
 };
 
