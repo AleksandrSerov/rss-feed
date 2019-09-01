@@ -28,7 +28,7 @@ const getChannel = (data, id) => {
   element.addEventListener('click', (e) => {
     e.preventDefault();
     setState({
-      activeArticlesList: state.articles[id],
+      activeArticlesList: state.articlesLists[id],
     });
   });
 
@@ -90,10 +90,10 @@ const getArticle = (data) => {
 };
 
 const getArticlesList = (data) => {
-  const articles = data.querySelectorAll('item');
+  const articlesLists = data.querySelectorAll('item');
   const html = `<div class="list-group"></div>`;
   const dom = htmlToElement(html);
-  [...articles].forEach((article) => {
+  [...articlesLists].forEach((article) => {
     dom.appendChild(getArticle(article));
   });
 
@@ -101,10 +101,10 @@ const getArticlesList = (data) => {
 };
 
 const build = (data) => {
-  const { channels, articles, channelsById, articlesById } = state;
+  const { channels, articlesLists, channelsById, articlesListsById } = state;
   const id = uniqid();
   const channel = getChannel(data, id);
-  const articlesList = getArticlesList(data);
+  const list = getArticlesList(data);
 
   setState({
     channels: {
@@ -112,11 +112,11 @@ const build = (data) => {
       [id]: channel,
     },
     channelsById: [...channelsById, id],
-    articles: {
-      ...articles,
-      [id]: articlesList,
+    articlesLists: {
+      ...articlesLists,
+      [id]: list,
     },
-    articlesById: [...articlesById, id],
+    articlesListsById: [...articlesListsById, id],
   });
   console.log(state);
 };

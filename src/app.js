@@ -12,7 +12,7 @@ const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 
-const typesStates = [
+const stateTypes = [
   {
     type: 'init',
     check: () => !state.processState,
@@ -35,12 +35,12 @@ const typesStates = [
   },
 ];
 
-const getTypeState = () => typesStates.find(({ check }) => check()).type;
+const getTypeState = () => stateTypes.find(({ check }) => check()).type;
 
 const formStates = {
   init: () => {
     setState({
-      query: 'http://www.habrahabr.ru/rss/main/',
+      query: '',
       isValidQuery: true,
     });
     searchButton.disabled = false;
@@ -89,13 +89,29 @@ const handleSubmit = () => {
     build(parsed);
     setState({
       isFetching: false,
-      queryList: [...queryList, query],
+      queryList: [...queryList, url],
       query: '',
       activeArticlesList: state.activeArticlesList.length
         ? state.activeArticlesList
-        : state.articles[state.articlesById[0]],
+        : state.articlesLists[state.articlesListsById[0]],
     });
   });
+};
+
+const checkForUpdates = () => {
+  setInterval(() => {
+    const { queryList } = state;
+    const promises = queryList.map(axios.get);
+    Promise.all(promises).then((arr) => {
+      arr
+        .map(({ data }) => data)
+        .map(parse)
+        .forEach((data) => {
+          console.log(state);
+          console.log(data);
+        });
+    });
+  }, 5000);
 };
 
 const app = () => {
@@ -114,6 +130,8 @@ const app = () => {
   watch(state, 'activeArticlesList', () => {
     renderArticlesList();
   });
+
+  checkForUpdates();
 
   setState({ processState: 'init' });
 

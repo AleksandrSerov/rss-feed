@@ -7,8 +7,8 @@ export const state = {
   isError: false,
   channels: {},
   channelsById: [],
-  articles: {},
-  articlesById: [],
+  articlesLists: {},
+  articlesListsById: [],
   activeArticlesList: [],
 };
 

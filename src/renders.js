@@ -1,11 +1,11 @@
 import { state } from './state';
 
 const cards = document.getElementById('cardsList');
-const articlesList = document.getElementById('articlesLists');
+const articlesListsList = document.getElementById('articlesListsLists');
 export const renderArticlesList = () => {
   const { activeArticlesList } = state;
-  articlesList.innerHTML = '';
-  articlesList.append(activeArticlesList);
+  articlesListsList.innerHTML = '';
+  articlesListsList.append(activeArticlesList);
 };
 
 export const renderChannels = () => {
