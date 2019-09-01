@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import uuid from 'uuid/v1';
+import uniqid from 'uniqid';
 import { state, setState } from './state';
 
 const htmlToElement = (html) => {
@@ -66,7 +66,7 @@ const getModal = (data) => {
 const getArticle = (data) => {
   const text = data.querySelector('title').firstChild.data;
   const href = data.querySelector('link').innerHTML;
-  const articleId = uuid();
+  const id = uniqid();
   const modal = getModal(data);
   const html = `
   <div class="card">
@@ -74,14 +74,13 @@ const getArticle = (data) => {
       <h5 class="card-title">
         <a class="card-link" href="${href}">${text}</a><br/>
       </h5>
-      <button id="${articleId}" class="btn btn-primary">Read description</button>
+      <button id="${id}" class="btn btn-primary">Read description</button>
     </div>
   </div>
   `;
 
   const dom = htmlToElement(html);
-
-  const button = dom.querySelector(`#${articleId}`);
+  const button = dom.querySelector(`#${id}`);
   $(button).click(() => {
     $(modal).modal('toggle');
   });
@@ -103,7 +102,7 @@ const getArticlesList = (data) => {
 
 const build = (data) => {
   const { channels, articles, channelsById, articlesById } = state;
-  const id = uuid();
+  const id = uniqid();
   const channel = getChannel(data, id);
   const articlesList = getArticlesList(data);
 
@@ -119,6 +118,7 @@ const build = (data) => {
     },
     articlesById: [...articlesById, id],
   });
+  console.log(state);
 };
 
 export default build;
