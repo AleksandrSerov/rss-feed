@@ -12,6 +12,7 @@ const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
+
 const stateTypes = [
   {
     type: 'init',
@@ -155,7 +156,6 @@ const app = () => {
     setState({
       processState: getTypeState(),
     });
-    console.log(state.processState);
   });
 
   watch(state, 'processState', () => {
