@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { state } from './state';
 
 const cards = document.getElementById('cardsList');

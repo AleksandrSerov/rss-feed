@@ -61,9 +61,6 @@ const getArticleDescriptionModal = (data) => {
 
   const dom = htmlToElement(html);
 
-  $(dom).on('hidde.bs.modal', () => {
-    $(dom).modal('hide');
-  });
   return dom;
 };
 
@@ -73,17 +70,21 @@ const getArticle = (data) => {
   const articleId = uuid();
   const modal = getArticleDescriptionModal(data);
   const html = `
-  <div>
-    <a class="list-group-item list-group-item-action" href="${href}">${text}</a>
-    <div>
-      <a class="list-group-item list-group-item-action article-item" href="#${articleId}">Read</a>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">
+        <a class="card-link" href="${href}">${text}</a><br/>
+      </h5>
+      <a href="#${articleId}" class="btn btn-primary">Read description</a>
     </div>
   </div>
+ 
   `;
+
   const dom = htmlToElement(html);
-  const element = dom.querySelector('.article-item');
+  const element = dom.querySelector('.btn');
   $(element).click(() => {
-    $(modal).modal('show');
+    $(modal).modal('toggle');
   });
 
   dom.append(modal);
