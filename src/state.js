@@ -9,7 +9,7 @@ export const state = {
   channelsById: [],
   articlesLists: {},
   articlesListsById: [],
-  activeArticlesList: [],
+  activeArticlesListId: null,
 };
 
 export const setState = (params) => {

@@ -2,7 +2,7 @@ import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 import { watch } from 'melanke-watchjs';
 import { state, setState } from './state';
-import build from './builder';
+import { getArticlesList, build } from './builder';
 import parse from './parse';
 import { render, renderArticlesList } from './renders';
 
@@ -11,11 +11,15 @@ const corsURL = 'https://cors-anywhere.herokuapp.com';
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
-
+const errorModal = document.getElementById('errorModal');
 const stateTypes = [
   {
     type: 'init',
     check: () => !state.processState,
+  },
+  {
+    type: 'error',
+    check: () => state.isError,
   },
   {
     type: 'loading',
@@ -28,10 +32,6 @@ const stateTypes = [
   {
     type: 'valid',
     check: () => state.isValidQuery,
-  },
-  {
-    type: 'error',
-    check: () => state.isError,
   },
 ];
 
@@ -63,13 +63,27 @@ const formStates = {
   error: () => {
     searchButton.innerHTML = 'Error';
     searchButton.disabled = true;
+    errorModal.classList.remove('d-none');
   },
+};
+
+const isValidInput = (value) => {
+  const { queryList } = state;
+
+  if (!isURL(value)) {
+    return false;
+  }
+  if (queryList.includes(`${corsURL}/${value}`)) {
+    return false;
+  }
+
+  return true;
 };
 
 const handleInput = (value) => {
   setState({
     query: value,
-    isValidQuery: isURL(value),
+    isValidQuery: isValidInput(value),
   });
 };
 
@@ -81,44 +95,67 @@ const handleSubmit = () => {
 
   const url = `${corsURL}/${query}`;
 
-  axios.get(url).then((response) => {
-    const { data } = response;
-    const parsed = parse(data);
-    input.value = '';
+  axios
+    .get(url)
+    .then(({ data }) => {
+      const parsed = parse(data);
+      input.value = '';
 
-    build(parsed);
-    setState({
-      isFetching: false,
-      queryList: [...queryList, url],
-      query: '',
-      activeArticlesList: state.activeArticlesList.length
-        ? state.activeArticlesList
-        : state.articlesLists[state.articlesListsById[0]],
+      build(parsed);
+      setState({
+        isFetching: false,
+        queryList: [...queryList, url],
+        query: '',
+        activeArticlesListId: state.activeArticlesListId
+          ? state.activeArticlesListId
+          : state.articlesListsById[0],
+      });
+    })
+    .catch(() => {
+      setState({
+        isError: true,
+      });
     });
-  });
 };
 
 const checkForUpdates = () => {
   setInterval(() => {
-    const { queryList } = state;
+    const { queryList, articlesListsById, articlesLists } = state;
     const promises = queryList.map(axios.get);
-    Promise.all(promises).then((arr) => {
-      arr
-        .map(({ data }) => data)
-        .map(parse)
-        .forEach((data) => {
-          console.log(state);
-          console.log(data);
+    Promise.all(promises)
+      .then((arr) => {
+        arr
+          .map(({ data }) => data)
+          .map(parse)
+          .forEach((data, index) => {
+            const articlesList = getArticlesList(data);
+            const id = articlesListsById[index];
+            const stateArticlesList = articlesLists[id];
+            const newArticles = articlesList.filter(
+              ({ uid }, idx) => uid !== stateArticlesList[idx].uid,
+            );
+            setState({
+              articlesLists: {
+                ...articlesLists,
+                [id]: [...articlesLists[id], ...newArticles],
+              },
+            });
+          });
+      })
+      .catch(() => {
+        setState({
+          isError: true,
         });
-    });
+      });
   }, 5000);
 };
 
 const app = () => {
-  watch(state, ['query', 'isValidQuery', 'isFetching'], () => {
+  watch(state, ['query', 'isValidQuery', 'isFetching', 'isError'], () => {
     setState({
       processState: getTypeState(),
     });
+    console.log(state.processState);
   });
 
   watch(state, 'processState', () => {
@@ -127,7 +164,11 @@ const app = () => {
     render();
   });
 
-  watch(state, 'activeArticlesList', () => {
+  watch(state, 'activeArticlesListId', () => {
+    renderArticlesList();
+  });
+
+  watch(state, 'articlesLists', () => {
     renderArticlesList();
   });
 

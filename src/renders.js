@@ -1,15 +1,27 @@
 import { state } from './state';
 
 const cards = document.getElementById('cardsList');
-const articlesListsList = document.getElementById('articlesListsLists');
+const articlesList = document.getElementById('articlesList');
+
 export const renderArticlesList = () => {
-  const { activeArticlesList } = state;
-  articlesListsList.innerHTML = '';
-  articlesListsList.append(activeArticlesList);
+  const { activeArticlesListId, articlesLists } = state;
+  if (!activeArticlesListId) {
+    return;
+  }
+  articlesList.innerHTML = '';
+  const list = articlesLists[activeArticlesListId];
+
+  list.forEach(({ dom }) => {
+    articlesList.append(dom);
+  });
 };
 
 export const renderChannels = () => {
   const { channelsById, channels } = state;
+  if (!channelsById.length) {
+    return;
+  }
+
   channelsById.forEach((id) => cards.append(channels[id]));
 };
 

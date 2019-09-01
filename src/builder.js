@@ -8,7 +8,20 @@ const htmlToElement = (html) => {
   return template.content.firstChild;
 };
 
-const getChannel = (data, id) => {
+const getUid = (data) => {
+  const guid = data.querySelector('guid');
+  if (guid) {
+    return guid.innerHTML;
+  }
+  const pubDate = data.querySelector('pubDate');
+  if (pubDate) {
+    return pubDate.innerHTML;
+  }
+  const title = data.querySelector('title');
+  return title.innerHTML;
+};
+
+export const getChannel = (data, id) => {
   const title = data.querySelector('title').innerHTML;
   const text = data.querySelector('description').firstChild.data;
   const html = `
@@ -28,14 +41,14 @@ const getChannel = (data, id) => {
   element.addEventListener('click', (e) => {
     e.preventDefault();
     setState({
-      activeArticlesList: state.articlesLists[id],
+      activeArticlesListId: id,
     });
   });
 
   return dom;
 };
 
-const getModal = (data) => {
+export const getModal = (data) => {
   const description = data.querySelector('description').firstChild.data;
   const html = `
     <div class="modal" tabindex="-1" role="dialog">
@@ -63,9 +76,10 @@ const getModal = (data) => {
   return dom;
 };
 
-const getArticle = (data) => {
+export const getArticle = (data) => {
   const text = data.querySelector('title').firstChild.data;
   const href = data.querySelector('link').innerHTML;
+  const uid = getUid(data);
   const id = uniqid();
   const modal = getModal(data);
   const html = `
@@ -86,21 +100,15 @@ const getArticle = (data) => {
   });
   dom.append(modal);
 
-  return dom;
+  return { dom, uid };
 };
 
-const getArticlesList = (data) => {
-  const articlesLists = data.querySelectorAll('item');
-  const html = `<div class="list-group"></div>`;
-  const dom = htmlToElement(html);
-  [...articlesLists].forEach((article) => {
-    dom.appendChild(getArticle(article));
-  });
-
-  return dom;
+export const getArticlesList = (data) => {
+  const articlesHTML = data.querySelectorAll('item');
+  return [...articlesHTML].map(getArticle);
 };
 
-const build = (data) => {
+export const build = (data) => {
   const { channels, articlesLists, channelsById, articlesListsById } = state;
   const id = uniqid();
   const channel = getChannel(data, id);
@@ -120,5 +128,3 @@ const build = (data) => {
   });
   console.log(state);
 };
-
-export default build;
