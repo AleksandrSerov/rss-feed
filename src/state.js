@@ -1,6 +1,6 @@
 export const state = {
   processState: 'init',
-  query: 'http://www.habrahabr.ru/rss/main/',
+  query: '',
   queryList: [],
   isValidQuery: true,
   isFetching: false,
