@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import uniqid from 'uniqid';
 
 export const getModal = (data) => {
   const description = data.querySelector('description').firstChild.data;
