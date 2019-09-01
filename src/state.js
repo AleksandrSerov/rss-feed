@@ -10,9 +10,6 @@ export const state = {
   articles: {},
   articlesById: [],
   activeArticlesList: [],
-  articlesDescription: {},
-  articlesDescriptionById: [],
-  activeArticleDescriptionId: null,
 };
 
 export const setState = (params) => {

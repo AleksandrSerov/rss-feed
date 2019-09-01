@@ -8,7 +8,7 @@ const htmlToElement = (html) => {
   return template.content.firstChild;
 };
 
-const getCard = (data, id) => {
+const getChannel = (data, id) => {
   const title = data.querySelector('title').innerHTML;
   const text = data.querySelector('description').firstChild.data;
   const html = `
@@ -28,18 +28,17 @@ const getCard = (data, id) => {
   element.addEventListener('click', (e) => {
     e.preventDefault();
     setState({
-      activeArticlesList: state.articles[element.hash.slice(1)],
+      activeArticlesList: state.articles[id],
     });
   });
 
   return dom;
 };
 
-const getArticleDescriptionModal = (data) => {
+const getModal = (data) => {
   const description = data.querySelector('description').firstChild.data;
-  const modalId = uuid();
   const html = `
-    <div class="modal" tabindex="-1" role="dialog" id="${modalId}">
+    <div class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -68,26 +67,26 @@ const getArticle = (data) => {
   const text = data.querySelector('title').firstChild.data;
   const href = data.querySelector('link').innerHTML;
   const articleId = uuid();
-  const modal = getArticleDescriptionModal(data);
+  const modal = getModal(data);
   const html = `
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">
         <a class="card-link" href="${href}">${text}</a><br/>
       </h5>
-      <a href="#${articleId}" class="btn btn-primary">Read description</a>
+      <button id="${articleId}" class="btn btn-primary">Read description</button>
     </div>
   </div>
- 
   `;
 
   const dom = htmlToElement(html);
-  const element = dom.querySelector('.btn');
-  $(element).click(() => {
+
+  const button = dom.querySelector(`#${articleId}`);
+  $(button).click(() => {
     $(modal).modal('toggle');
   });
-
   dom.append(modal);
+
   return dom;
 };
 
@@ -105,13 +104,13 @@ const getArticlesList = (data) => {
 const build = (data) => {
   const { channels, articles, channelsById, articlesById } = state;
   const id = uuid();
-  const card = getCard(data, id);
+  const channel = getChannel(data, id);
   const articlesList = getArticlesList(data);
 
   setState({
     channels: {
       ...channels,
-      [id]: card,
+      [id]: channel,
     },
     channelsById: [...channelsById, id],
     articles: {
