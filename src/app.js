@@ -104,23 +104,19 @@ const app = () => {
       const { queryList, feed } = state;
       const promises = queryList.map(axios.get);
       Promise.all(promises)
-        .then((arr) => arr.map(({ data }) => data))
-        .then((data) => {
-          const parsed = data.map(parse);
-          parsed.forEach((item, index) => {
-            const apiArticles = item.items;
-            const stateArticles = feed[index].items;
-            const newArticles = apiArticles.filter(
-              ({ uid }, idx) => uid !== stateArticles[idx].uid,
+        .then((arr) => arr.map(({ data }) => parse(data)))
+        .then((parsed) => {
+          parsed.forEach(({ items }, index) => {
+            const currentFeed = feed[index];
+            const { items: currentItems } = currentFeed;
+            const newArticles = items.filter(
+              ({ uid }, idx) => uid !== currentItems[idx].uid,
             );
             if (!newArticles.length) {
               return;
             }
 
-            state.feed[index].items = [
-              ...state.feed[index].items,
-              ...newArticles,
-            ];
+            currentFeed.items = [...currentFeed.items, ...newArticles];
           });
         });
     }, checkUpdateInterval);
