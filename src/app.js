@@ -23,7 +23,6 @@ const app = () => {
 
   const formStates = {
     init: () => {
-      console.log('init');
       state.query = '';
       input.value = '';
       state.isValidQuery = true;
@@ -32,7 +31,6 @@ const app = () => {
       errorModal.classList.add('d-none');
     },
     loading: () => {
-      console.log('loading');
       searchButton.disabled = true;
       searchButton.innerHTML = 'Loading...';
     },
@@ -47,7 +45,6 @@ const app = () => {
       input.classList.remove('border-danger');
     },
     error: () => {
-      console.log('error');
       searchButton.innerHTML = 'Error';
       searchButton.disabled = true;
       errorModal.classList.remove('d-none');
