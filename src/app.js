@@ -46,15 +46,14 @@ const app = () => {
       input.classList.add('border-danger');
     },
     valid: () => {
+      input.classList.remove('border-danger');
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      input.classList.remove('border-danger');
     },
     error: () => {
+      input.disabled = true;
       searchButton.innerHTML = 'Error';
       searchButton.disabled = true;
-      input.disabled = true;
-
       errorModal.classList.remove('d-none');
       setTimeout(() => {
         state.processState = 'init';
@@ -62,7 +61,7 @@ const app = () => {
     },
   };
 
-  const isValidInput = (value) => {
+  const validateInut = (value) => {
     const { queryList } = state;
 
     if (
@@ -77,7 +76,7 @@ const app = () => {
   };
 
   const handleInput = (value) => {
-    isValidInput(value);
+    validateInut(value);
   };
 
   const handleSubmit = () => {
