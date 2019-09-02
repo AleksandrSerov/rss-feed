@@ -15,13 +15,6 @@ const errorModal = document.getElementById('errorModal');
 
 const exampleLinks = document.querySelectorAll('.exampleLink');
 const app = () => {
-  exampleLinks.forEach((link) => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      input.value = e.target.href;
-    });
-  });
-
   const state = {
     processState: null,
     queryList: [],
@@ -64,16 +57,26 @@ const app = () => {
   const validateInut = (value) => {
     const { queryList } = state;
 
-    if (
-      (value.length && !isURL(value)) ||
-      queryList.includes(`${corsURL}/${value}`)
-    ) {
+    if (!isURL(value) || queryList.includes(`${corsURL}/${value}`)) {
       state.processState = 'invalid';
       return;
     }
 
     state.processState = 'valid';
   };
+
+  exampleLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const value = e.target.href;
+      if (state.processState === 'loading') {
+        return;
+      }
+      input.value = value;
+      validateInut(value);
+    });
+  });
 
   const handleInput = (value) => {
     validateInut(value);
