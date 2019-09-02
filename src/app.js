@@ -1,180 +1,137 @@
 import isURL from 'validator/lib/isURL';
 import axios from 'axios';
+import _ from 'lodash';
 import { watch } from 'melanke-watchjs';
-import { state, setState } from './state';
-import { getArticlesList, build } from './builder';
-import parse from './parse';
-import { render, renderArticlesList } from './renders';
+import parse from './parser';
+import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
+const checkUpdateInterval = 5000;
 
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
-const stateTypes = [
-  {
-    type: 'init',
-    check: () => !state.processState,
-  },
-  {
-    type: 'error',
-    check: () => state.isError,
-  },
-  {
-    type: 'loading',
-    check: () => state.isFetching,
-  },
-  {
-    type: 'invalid',
-    check: () => !state.isValidQuery || state.queryList.includes(state.query),
-  },
-  {
-    type: 'valid',
-    check: () => state.isValidQuery,
-  },
-];
 
-const getTypeState = () => stateTypes.find(({ check }) => check()).type;
-
-const formStates = {
-  init: () => {
-    setState({
-      query: '',
-      isValidQuery: true,
+const exampleLinks = document.querySelectorAll('.exampleLink');
+const app = () => {
+  exampleLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      input.value = e.target.href;
     });
-    searchButton.disabled = false;
-    searchButton.innerHTML = 'Read';
-  },
-  loading: () => {
-    searchButton.disabled = true;
-    searchButton.innerHTML = 'Loading...';
-  },
-  invalid: () => {
-    searchButton.disabled = true;
-    searchButton.innerHTML = 'Invalid query';
-    input.classList.add('border-danger');
-  },
-  valid: () => {
-    searchButton.disabled = false;
-    searchButton.innerHTML = 'Read';
-    input.classList.remove('border-danger');
-  },
-  error: () => {
-    searchButton.innerHTML = 'Error';
-    searchButton.disabled = true;
-    errorModal.classList.remove('d-none');
-  },
-};
-
-const isValidInput = (value) => {
-  const { queryList } = state;
-
-  if (!isURL(value)) {
-    return false;
-  }
-  if (queryList.includes(`${corsURL}/${value}`)) {
-    return false;
-  }
-
-  return true;
-};
-
-const handleInput = (value) => {
-  setState({
-    query: value,
-    isValidQuery: isValidInput(value),
-  });
-};
-
-const handleSubmit = () => {
-  const { query, queryList } = state;
-  setState({
-    isFetching: true,
   });
 
-  const url = `${corsURL}/${query}`;
+  const state = {
+    processState: null,
+    queryList: [],
+    feed: [],
+  };
 
-  axios
-    .get(url)
-    .then(({ data }) => {
-      const parsed = parse(data);
+  const formStates = {
+    init: () => {
       input.value = '';
+      input.disabled = false;
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+      errorModal.classList.add('d-none');
+    },
+    loading: () => {
+      searchButton.disabled = true;
+      searchButton.innerHTML = 'Loading...';
+    },
+    invalid: () => {
+      searchButton.disabled = true;
+      searchButton.innerHTML = 'Invalid query';
+      input.classList.add('border-danger');
+    },
+    valid: () => {
+      input.classList.remove('border-danger');
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+    },
+    error: () => {
+      input.disabled = true;
+      searchButton.innerHTML = 'Error';
+      searchButton.disabled = true;
+      errorModal.classList.remove('d-none');
+      setTimeout(() => {
+        state.processState = 'init';
+      }, 2500);
+    },
+  };
 
-      build(parsed);
-      setState({
-        isFetching: false,
-        queryList: [...queryList, url],
-        query: '',
-        activeArticlesListId: state.activeArticlesListId
-          ? state.activeArticlesListId
-          : state.articlesListsById[0],
-      });
-    })
-    .catch(() => {
-      setState({
-        isError: true,
-      });
-    });
-};
+  const validateInut = (value) => {
+    const { queryList } = state;
 
-const checkForUpdates = () => {
-  setInterval(() => {
-    const { queryList, articlesListsById, articlesLists } = state;
-    const promises = queryList.map(axios.get);
-    Promise.all(promises)
-      .then((arr) => {
-        arr
-          .map(({ data }) => data)
-          .map(parse)
-          .forEach((data, index) => {
-            const articlesList = getArticlesList(data);
-            const id = articlesListsById[index];
-            const stateArticlesList = articlesLists[id];
-            const newArticles = articlesList.filter(
-              ({ uid }, idx) => uid !== stateArticlesList[idx].uid,
-            );
-            setState({
-              articlesLists: {
-                ...articlesLists,
-                [id]: [...articlesLists[id], ...newArticles],
-              },
-            });
-          });
+    if (
+      (value.length && !isURL(value)) ||
+      queryList.includes(`${corsURL}/${value}`)
+    ) {
+      state.processState = 'invalid';
+      return;
+    }
+
+    state.processState = 'valid';
+  };
+
+  const handleInput = (value) => {
+    validateInut(value);
+  };
+
+  const handleSubmit = () => {
+    const { value } = input;
+
+    if (!value.length) {
+      state.processState = 'error';
+      return;
+    }
+
+    state.processState = 'loading';
+
+    const url = `${corsURL}/${value}`;
+
+    axios
+      .get(url)
+      .then(({ data }) => {
+        const parsed = parse(data);
+        state.processState = 'init';
+        state.feed = [...state.feed, parsed];
+        state.queryList = [...state.queryList, url];
       })
       .catch(() => {
-        setState({
-          isError: true,
-        });
+        state.processState = 'error';
       });
-  }, 5000);
-};
+  };
 
-const app = () => {
-  watch(state, ['query', 'isValidQuery', 'isFetching', 'isError'], () => {
-    setState({
-      processState: getTypeState(),
-    });
-    console.log(state.processState);
+  const checkForUpdates = () => {
+    setInterval(() => {
+      const { queryList, feed } = state;
+      const promises = queryList.map(axios.get);
+      Promise.all(promises)
+        .then((arr) => arr.map(({ data }) => parse(data)))
+        .then((parsed) => {
+          parsed.forEach(({ items }, index) => {
+            const currentFeed = feed[index];
+            currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
+          });
+        });
+    }, checkUpdateInterval);
+  };
+
+  watch(state, 'feed', () => {
+    const { feed } = state;
+
+    render(feed);
   });
 
   watch(state, 'processState', () => {
     const { processState } = state;
     formStates[processState]();
-    render();
-  });
-
-  watch(state, 'activeArticlesListId', () => {
-    renderArticlesList();
-  });
-
-  watch(state, 'articlesLists', () => {
-    renderArticlesList();
   });
 
   checkForUpdates();
-
-  setState({ processState: 'init' });
+  state.processState = 'init';
 
   input.addEventListener('input', (e) => {
     handleInput(e.target.value);
