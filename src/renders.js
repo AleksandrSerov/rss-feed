@@ -110,6 +110,7 @@ const renderList = (item) => {
   if (!articleList) {
     const list = getArticlesList(item);
     articlesList.appendChild(list);
+    return;
   }
 
   articleList.innerHTML = '';
