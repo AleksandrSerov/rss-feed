@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 export const getModal = (data) => {
   const description = data.querySelector('description').firstChild.data;
   const html = `
@@ -46,5 +44,4 @@ export const build = (data) => {
     },
     articlesListsById: [...articlesListsById, id],
   });
-  console.log(state);
 };
