@@ -12,7 +12,16 @@ const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
+
+const exampleLinks = document.querySelectorAll('.exampleLink');
 const app = () => {
+  exampleLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      input.value = e.target.href;
+    });
+  });
+
   const state = {
     processState: null,
     queryList: [],
