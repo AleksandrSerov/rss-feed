@@ -1,38 +1,12 @@
 const channelsList = document.getElementById('channelsList');
 const articlesList = document.getElementById('articlesList');
+const modalList = document.getElementById('modal');
 
 const htmlToElement = (html) => {
   const template = document.createElement('template');
   template.innerHTML = html.trim();
   return template.content.firstChild;
 };
-
-// export const renderArticlesList = () => {
-//   const { activeArticlesListId, articlesLists } = state;
-//   if (!activeArticlesListId) {
-//     return;
-//   }
-//   articlesList.innerHTML = '';
-//   const list = articlesLists[activeArticlesListId];
-
-//   list.forEach(({ dom }) => {
-//     articlesList.append(dom);
-//   });
-// };
-
-// export const renderChannels = () => {
-//   const { channelsById, channels } = state;
-//   if (!channelsById.length) {
-//     return;
-//   }
-
-//   channelsById.forEach((id) => cards.append(channels[id]));
-// };
-
-// export const render = () => {
-//   renderChannels();
-//   renderArticlesList();
-// };
 
 export const getChannel = (feed) => {
   const { title, text, id } = feed;
@@ -53,25 +27,52 @@ export const getChannel = (feed) => {
   return dom;
 };
 
+export const getModal = (description, id) => {
+  const html = `
+  <div class="modal fade" id="${id}" tabindex="-1" role="dialog" aria-labelledby="example" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Description</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>${description}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const dom = htmlToElement(html);
+
+  return dom;
+};
+
 export const getArticle = (item) => {
-  const { title, link, uid } = item;
+  const { title, link, id, description } = item;
   const html = `
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">
         <a class="card-link" href="${link}">${title}</a><br/>
       </h5>
-      <button  class="btn btn-primary">Read description</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#${id}">
+        Read description
+      </button>
     </div>
   </div>
   `;
 
+  const modal = getModal(description, id);
+  modalList.appendChild(modal);
+
   const dom = htmlToElement(html);
-  // const button = dom.querySelector(`#${id}`);
-  // $(button).click(() => {
-  //   $(modal).modal('toggle');
-  // });
-  // dom.append(modal);
 
   return dom;
 };
@@ -79,7 +80,6 @@ export const getArticle = (item) => {
 export const getArticlesList = (feed) => {
   const { items, id } = feed;
   const isEmptyList = !articlesList.innerHTML.length;
-  console.log(isEmptyList);
   const html = `
   <div class="tab-pane fade ${
     isEmptyList ? 'show active' : ''

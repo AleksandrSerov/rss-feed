@@ -21,11 +21,13 @@ const getItems = (channel) => {
     const title = item.querySelector('title').firstChild.data;
     const link = item.querySelector('link').innerHTML;
     const description = item.querySelector('description').firstChild.data;
+    const id = `modal-${uniqid()}`;
     const uid = getUid(item);
     return {
       title,
       link,
       uid,
+      id,
       description,
     };
   });
