@@ -2,7 +2,7 @@ import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 import _ from 'lodash';
 import { watch } from 'melanke-watchjs';
-import parse from './parse';
+import parse from './parser';
 import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
