@@ -16,7 +16,6 @@ const app = () => {
   const state = {
     processState: null,
     queryList: [],
-    isValidQuery: true,
     feed: [],
   };
 
@@ -24,7 +23,6 @@ const app = () => {
     init: () => {
       input.value = '';
       input.disabled = false;
-      state.isValidQuery = true;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
       errorModal.classList.add('d-none');
@@ -58,23 +56,24 @@ const app = () => {
   const isValidInput = (value) => {
     const { queryList } = state;
 
-    if (value.length && !isURL(value)) {
-      return false;
-    }
-    if (queryList.includes(`${corsURL}/${value}`)) {
-      return false;
+    if (
+      (value.length && !isURL(value)) ||
+      queryList.includes(`${corsURL}/${value}`)
+    ) {
+      state.processState = 'invalid';
+      return;
     }
 
-    return true;
+    state.processState = 'valid';
   };
 
   const handleInput = (value) => {
-    state.query = value;
-    state.isValidQuery = isValidInput(value);
+    isValidInput(value);
   };
 
   const handleSubmit = () => {
     const { value } = input;
+
     if (!value.length) {
       state.processState = 'error';
       return;
@@ -120,7 +119,6 @@ const app = () => {
 
   watch(state, 'processState', () => {
     const { processState } = state;
-
     formStates[processState]();
   });
 
