@@ -1,5 +1,6 @@
 import isURL from 'validator/lib/isURL';
 import axios from 'axios';
+import _ from 'lodash';
 import { watch } from 'melanke-watchjs';
 import parse from './parse';
 import render from './renders';
@@ -108,15 +109,7 @@ const app = () => {
         .then((parsed) => {
           parsed.forEach(({ items }, index) => {
             const currentFeed = feed[index];
-            const { items: currentItems } = currentFeed;
-            const newArticles = items.filter(
-              ({ uid }, idx) => uid !== currentItems[idx].uid,
-            );
-            if (!newArticles.length) {
-              return;
-            }
-
-            currentFeed.items = [...currentFeed.items, ...newArticles];
+            currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
           });
         });
     }, checkUpdateInterval);
