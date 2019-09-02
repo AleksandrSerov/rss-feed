@@ -5,15 +5,15 @@ import parse from './parse';
 import { renderFeed } from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
+const checkUpdateInterval = 5000;
 
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
-
 const app = () => {
   const state = {
-    processState: 'init',
+    processState: null,
     query: '',
     queryList: [],
     isValidQuery: true,
@@ -25,6 +25,7 @@ const app = () => {
     init: () => {
       state.query = '';
       input.value = '';
+      input.disabled = false;
       state.isValidQuery = true;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
@@ -47,6 +48,8 @@ const app = () => {
     error: () => {
       searchButton.innerHTML = 'Error';
       searchButton.disabled = true;
+      input.disabled = true;
+
       errorModal.classList.remove('d-none');
       setTimeout(() => {
         state.processState = 'init';
@@ -110,21 +113,28 @@ const app = () => {
             const newArticles = apiArticles.filter(
               ({ uid }, idx) => uid !== stateArticles[idx].uid,
             );
+            if (!newArticles.length) {
+              return;
+            }
+
             state.feed[index].items = [
               ...state.feed[index].items,
               ...newArticles,
             ];
           });
         });
-    }, 4000);
+    }, checkUpdateInterval);
   };
 
   watch(state, 'feed', () => {
-    renderFeed(state.feed);
+    const { feed } = state;
+
+    renderFeed(feed);
   });
 
   watch(state, 'processState', () => {
     const { processState } = state;
+
     formStates[processState]();
   });
 
