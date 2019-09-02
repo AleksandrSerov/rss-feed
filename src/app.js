@@ -96,40 +96,31 @@ const app = () => {
       });
   };
 
-  // const checkForUpdates = () => {
-  //   setInterval(() => {
-  //     const { queryList, articlesListsById, articlesLists } = state;
-  //     const promises = queryList.map(axios.get);
-  //     Promise.all(promises)
-  //       .then((arr) => {
-  //         arr
-  //           .map(({ data }) => data)
-  //           .map(parse)
-  //           .forEach((data, index) => {
-  //             const articlesList = getArticlesList(data);
-  //             const id = articlesListsById[index];
-  //             const stateArticlesList = articlesLists[id];
-  //             const newArticles = articlesList.filter(
-  //               ({ uid }, idx) => uid !== stateArticlesList[idx].uid,
-  //             );
-  //             setState({
-  //               articlesLists: {
-  //                 ...articlesLists,
-  //                 [id]: [...articlesLists[id], ...newArticles],
-  //               },
-  //             });
-  //           });
-  //       })
-  //       .catch(() => {
-  //         setState({
-  //           isError: true,
-  //         });
-  //       });
-  //   }, 5000);
-  // };
+  const checkForUpdates = () => {
+    setInterval(() => {
+      const { queryList, feed } = state;
+      const promises = queryList.map(axios.get);
+      Promise.all(promises)
+        .then((arr) => arr.map(({ data }) => data))
+        .then((data) => {
+          const parsed = data.map(parse);
+          parsed.forEach((item, index) => {
+            const apiArticles = item.items;
+            const stateArticles = feed[index].items;
+            const newArticles = apiArticles.filter(
+              ({ uid }, idx) => uid !== stateArticles[idx].uid,
+            );
+            state.feed[index].items = [
+              ...state.feed[index].items,
+              ...newArticles,
+            ];
+          });
+        });
+    }, 4000);
+  };
+
   watch(state, 'feed', () => {
-    const feed = state.feed[state.feed.length - 1];
-    renderFeed(feed, state.activeFeedId);
+    renderFeed(state.feed);
   });
 
   watch(state, 'processState', () => {
@@ -137,7 +128,7 @@ const app = () => {
     formStates[processState]();
   });
 
-  // checkForUpdates();
+  checkForUpdates();
   state.processState = 'init';
 
   input.addEventListener('input', (e) => {

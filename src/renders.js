@@ -14,7 +14,7 @@ export const getChannel = (feed) => {
   const html = `
     <a class="list-group-item list-group-item-action ${
       isEmptyList ? 'active' : ''
-    }" data-toggle="list" href="#${id}" role="tab">
+    }" data-toggle="list" href="#list-${id}" id="${id}" role="tab">
       <div class="card-body">
         <h5 class="card-title">${title}</h5>
         <p class="card-text">${text}</p>
@@ -69,8 +69,10 @@ export const getArticle = (item) => {
   </div>
   `;
 
-  const modal = getModal(description, id);
-  modalList.appendChild(modal);
+  if (!modalList.querySelector(`#${id}`)) {
+    const modal = getModal(description, id);
+    modalList.appendChild(modal);
+  }
 
   const dom = htmlToElement(html);
 
@@ -83,21 +85,40 @@ export const getArticlesList = (feed) => {
   const html = `
   <div class="tab-pane fade ${
     isEmptyList ? 'show active' : ''
-  }" id="${id}" role="tabpanel">
+  }" id="list-${id}" role="tabpanel">
   </div>
   `;
 
   const dom = htmlToElement(html);
 
   items.map(getArticle).forEach((item) => dom.append(item));
-
   return dom;
 };
 
-export const renderFeed = (feed) => {
-  const channel = getChannel(feed);
-  channelsList.appendChild(channel);
+const renderChannel = (item) => {
+  const { id } = item;
+  const channelList = channelsList.querySelector(`#${id}`);
+  if (!channelList) {
+    const channel = getChannel(item);
+    channelsList.appendChild(channel);
+  }
+};
 
-  const list = getArticlesList(feed);
-  articlesList.appendChild(list);
+const renderList = (item) => {
+  const { id, items } = item;
+  const articleList = articlesList.querySelector(`#list-${id}`);
+  if (!articleList) {
+    const list = getArticlesList(item);
+    articlesList.appendChild(list);
+  }
+
+  articleList.innerHTML = '';
+  items.map(getArticle).forEach((article) => articleList.append(article));
+};
+
+export const renderFeed = (feed) => {
+  feed.forEach((item) => {
+    renderChannel(item);
+    renderList(item);
+  });
 };
