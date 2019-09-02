@@ -15,16 +15,13 @@ const errorModal = document.getElementById('errorModal');
 const app = () => {
   const state = {
     processState: null,
-    query: '',
     queryList: [],
     isValidQuery: true,
-    isFetching: false,
     feed: [],
   };
 
   const formStates = {
     init: () => {
-      state.query = '';
       input.value = '';
       input.disabled = false;
       state.isValidQuery = true;
@@ -77,15 +74,15 @@ const app = () => {
   };
 
   const handleSubmit = () => {
-    const { query } = state;
-    if (!query.length) {
+    const { value } = input;
+    if (!value.length) {
       state.processState = 'error';
       return;
     }
 
     state.processState = 'loading';
 
-    const url = `${corsURL}/${query}`;
+    const url = `${corsURL}/${value}`;
 
     axios
       .get(url)
