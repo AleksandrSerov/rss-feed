@@ -1,71 +1,50 @@
-const htmlToElement = (html) => {
-  const template = document.createElement('template');
-  template.innerHTML = html.trim();
-  return template.content.firstChild;
-};
+import $ from 'jquery';
 
-const getCardHTML = (props) => {
-  const { title, text, href = '#' } = props;
+export const getModal = (data) => {
+  const description = data.querySelector('description').firstChild.data;
   const html = `
-  <div class="card mb-1" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">${title}</h5>
-      <p class="card-text">${text}</p>
-      <a class="btn btn-primary" href="${href}">Read</a>
+    <div class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Description</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>${description}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
   `;
 
-  return html;
+  const dom = htmlToElement(html);
+
+  return dom;
 };
 
-const buildCard = (data) => {
-  const title = data.querySelector('title').innerHTML;
-  const text = data.querySelector('description').firstChild.data;
-  const html = getCardHTML({ title, text });
-  return htmlToElement(html);
+export const build = (data) => {
+  const { channels, articlesLists, channelsById, articlesListsById } = state;
+  const id = uniqid();
+  const channel = getChannel(data, id);
+  const list = getArticlesList(data);
+
+  setState({
+    channels: {
+      ...channels,
+      [id]: channel,
+    },
+    channelsById: [...channelsById, id],
+    articlesLists: {
+      ...articlesLists,
+      [id]: list,
+    },
+    articlesListsById: [...articlesListsById, id],
+  });
+  console.log(state);
 };
-
-const getArticleHTML = (props) => {
-  const { href, text } = props;
-  const html = `
-  <a class="list-group-item list-group-item-action" href="${href}">${text}</a>
-  `;
-
-  return html;
-};
-
-const getArticlesListHTML = (articles) => {
-  const html = `
-  <div class="list-group">
-    ${[...articles]
-      .map((article) => {
-        const text = article.querySelector('title').firstChild.data;
-        const href = article.querySelector('link').innerHTML;
-
-        return getArticleHTML({ href, text });
-      })
-      .join('')}
-  </div>
-  `;
-
-  return html;
-};
-
-const buildArticlesList = (data) => {
-  const articles = data.querySelectorAll('item');
-  const html = getArticlesListHTML(articles);
-
-  return htmlToElement(html);
-};
-
-const builder = (data) => {
-  const card = buildCard(data);
-  const articlesList = buildArticlesList(data);
-  return {
-    card,
-    articlesList,
-  };
-};
-
-export default builder;
