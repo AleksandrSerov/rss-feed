@@ -18,48 +18,21 @@ const app = () => {
     queryList: [],
     isValidQuery: true,
     isFetching: false,
-    isError: false,
-    channels: {},
-    channelsById: [],
-    articlesLists: {},
-    articlesListsById: [],
-    activeArticlesListId: null,
     feed: [],
   };
 
-  const stateTypes = [
-    {
-      type: 'init',
-      check: () => !state.processState,
-    },
-    {
-      type: 'error',
-      check: () => state.isError,
-    },
-    {
-      type: 'loading',
-      check: () => state.isFetching,
-    },
-    {
-      type: 'invalid',
-      check: () => !state.isValidQuery || state.queryList.includes(state.query),
-    },
-    {
-      type: 'valid',
-      check: () => state.isValidQuery,
-    },
-  ];
-
-  const getTypeState = () => stateTypes.find(({ check }) => check()).type;
-
   const formStates = {
     init: () => {
+      console.log('init');
       state.query = '';
+      input.value = '';
       state.isValidQuery = true;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
+      errorModal.classList.add('d-none');
     },
     loading: () => {
+      console.log('loading');
       searchButton.disabled = true;
       searchButton.innerHTML = 'Loading...';
     },
@@ -74,16 +47,20 @@ const app = () => {
       input.classList.remove('border-danger');
     },
     error: () => {
+      console.log('error');
       searchButton.innerHTML = 'Error';
       searchButton.disabled = true;
       errorModal.classList.remove('d-none');
+      setTimeout(() => {
+        state.processState = 'init';
+      }, 2500);
     },
   };
 
   const isValidInput = (value) => {
     const { queryList } = state;
 
-    if (!isURL(value)) {
+    if (value.length && !isURL(value)) {
       return false;
     }
     if (queryList.includes(`${corsURL}/${value}`)) {
@@ -100,7 +77,12 @@ const app = () => {
 
   const handleSubmit = () => {
     const { query } = state;
-    state.isFetching = true;
+    if (!query.length) {
+      state.processState = 'error';
+      return;
+    }
+
+    state.processState = 'loading';
 
     const url = `${corsURL}/${query}`;
 
@@ -108,15 +90,12 @@ const app = () => {
       .get(url)
       .then(({ data }) => {
         const parsed = parse(data);
-        console.log(parsed);
-        input.value = '';
+        state.processState = 'init';
         state.feed = [...state.feed, parsed];
-        state.isFetching = false;
         state.queryList = [...state.queryList, url];
-        state.query = '';
       })
       .catch(() => {
-        state.isError = true;
+        state.processState = 'error';
       });
   };
 
@@ -156,18 +135,9 @@ const app = () => {
     renderFeed(feed, state.activeFeedId);
   });
 
-  watch(state, ['query', 'isValidQuery', 'isFetching', 'isError'], () => {
-    state.processState = getTypeState();
-  });
-
   watch(state, 'processState', () => {
     const { processState } = state;
     formStates[processState]();
-    // render();
-  });
-
-  watch(state, ['activeArticlesListId', 'articlesLists'], () => {
-    // renderArticlesList();
   });
 
   // checkForUpdates();
