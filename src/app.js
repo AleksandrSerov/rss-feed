@@ -64,10 +64,7 @@ const app = () => {
   const validateInut = (value) => {
     const { queryList } = state;
 
-    if (
-      (value.length && !isURL(value)) ||
-      queryList.includes(`${corsURL}/${value}`)
-    ) {
+    if (!isURL(value) || queryList.includes(`${corsURL}/${value}`)) {
       state.processState = 'invalid';
       return;
     }
