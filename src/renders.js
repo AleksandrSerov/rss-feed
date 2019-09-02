@@ -8,7 +8,7 @@ const htmlToElement = (html) => {
   return template.content.firstChild;
 };
 
-export const getChannel = (feed) => {
+const getChannel = (feed) => {
   const { title, text, id } = feed;
   const isEmptyList = !channelsList.innerHTML.length;
   const html = `
@@ -27,7 +27,7 @@ export const getChannel = (feed) => {
   return dom;
 };
 
-export const getModal = (description, id) => {
+const getModal = (description, id) => {
   const html = `
   <div class="modal fade" id="${id}" tabindex="-1" role="dialog" aria-labelledby="example" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -54,7 +54,7 @@ export const getModal = (description, id) => {
   return dom;
 };
 
-export const getArticle = (item) => {
+const getArticle = (item) => {
   const { title, link, id, description } = item;
   const html = `
   <div class="card">
@@ -79,7 +79,7 @@ export const getArticle = (item) => {
   return dom;
 };
 
-export const getArticlesList = (feed) => {
+const getArticlesList = (feed) => {
   const { items, id } = feed;
   const isEmptyList = !articlesList.innerHTML.length;
   const html = `
@@ -117,7 +117,7 @@ const renderList = (item) => {
   items.map(getArticle).forEach((article) => articleList.append(article));
 };
 
-export const renderFeed = (feed) => {
+export default (feed) => {
   feed.forEach((item) => {
     renderChannel(item);
     renderList(item);

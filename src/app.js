@@ -2,7 +2,7 @@ import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 import { watch } from 'melanke-watchjs';
 import parse from './parse';
-import { renderFeed } from './renders';
+import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 const checkUpdateInterval = 5000;
@@ -129,7 +129,7 @@ const app = () => {
   watch(state, 'feed', () => {
     const { feed } = state;
 
-    renderFeed(feed);
+    render(feed);
   });
 
   watch(state, 'processState', () => {
