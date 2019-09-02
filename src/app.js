@@ -7,6 +7,7 @@ import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 const checkUpdateInterval = 5000;
+const removeErrorTimeout = 2500;
 
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
@@ -50,7 +51,7 @@ const app = () => {
       errorModal.classList.remove('d-none');
       setTimeout(() => {
         state.processState = 'init';
-      }, 2500);
+      }, removeErrorTimeout);
     },
   };
 
