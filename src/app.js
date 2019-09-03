@@ -105,7 +105,7 @@ const app = () => {
   };
 
   const checkForUpdates = () => {
-    setInterval(() => {
+    setTimeout(() => {
       const { queryList, feed } = state;
       const promises = queryList.map(axios.get);
       Promise.all(promises)
@@ -115,6 +115,7 @@ const app = () => {
             const currentFeed = feed[index];
             currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
           });
+          checkForUpdates();
         });
     }, checkUpdateInterval);
   };
