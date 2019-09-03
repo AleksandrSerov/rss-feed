@@ -32,6 +32,7 @@ const app = () => {
     },
     loading: () => {
       searchButton.disabled = true;
+      input.disabled = true;
       searchButton.innerHTML = 'Loading...';
     },
     invalid: () => {
@@ -86,11 +87,6 @@ const app = () => {
   const handleSubmit = () => {
     const { value } = input;
 
-    if (!value.length) {
-      state.processState = 'error';
-      return;
-    }
-
     state.processState = 'loading';
 
     const url = `${corsURL}/${value}`;
@@ -99,9 +95,9 @@ const app = () => {
       .get(url)
       .then(({ data }) => {
         const parsed = parse(data);
-        state.processState = 'init';
         state.feed = [...state.feed, parsed];
         state.queryList = [...state.queryList, url];
+        state.processState = 'init';
       })
       .catch(() => {
         state.processState = 'error';
@@ -125,7 +121,6 @@ const app = () => {
 
   watch(state, 'feed', () => {
     const { feed } = state;
-
     render(feed);
   });
 
