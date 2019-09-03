@@ -115,8 +115,11 @@ const app = () => {
             const currentFeed = feed[index];
             currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
           });
-          checkForUpdates();
-        });
+        })
+        .catch(() => {
+          state.processState = 'error';
+        })
+        .finally(checkForUpdates);
     }, checkUpdateInterval);
   };
 
