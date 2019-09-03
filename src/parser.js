@@ -18,7 +18,7 @@ const getUid = (item) => {
 const getItems = (channel) => {
   const items = channel.querySelectorAll('item');
   return [...items].map((item) => {
-    const title = item.querySelector('title').innerHTML;
+    const title = item.querySelector('title').firstChild.data;
     const link = item.querySelector('link').innerHTML;
     const description = item.querySelector('description').firstChild.data;
     const id = `modal-${uniqid()}`;
