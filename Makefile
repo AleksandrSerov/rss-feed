@@ -5,7 +5,7 @@ watch:
 test:
 	npm run test -- --coverage
 lint:
-	npx eslint .
+	npm run lint
 start:
 	npm run start
 build:
