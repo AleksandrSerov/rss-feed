@@ -24,6 +24,21 @@
         </div>
       </form>
     </nav>
+    <div
+      class="alert alert-danger d-none text-center my-0"
+      role="alert"
+      id="errorModal"
+    >
+      Something went wrong! Try again!
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        id="closeErrorButton"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
     <div class="jumbotron">
       <h2>Examples of RSS link</h2>
       <ul class="list-group col">
@@ -55,13 +70,7 @@
         </li>
       </ul>
     </div>
-    <div
-      class="alert alert-danger d-none text-center"
-      role="alert"
-      id="errorModal"
-    >
-      Something went wrong! Try again!
-    </div>
+
     <div class="feed mt-4 py-2 ">
       <div class="container ">
         <div class="row">

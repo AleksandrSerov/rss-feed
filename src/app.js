@@ -12,6 +12,7 @@ const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
+const closeErrorButton = document.getElementById('closeErrorButton');
 
 const exampleLinks = document.querySelectorAll('.exampleLink');
 const app = () => {
@@ -27,10 +28,10 @@ const app = () => {
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      errorModal.classList.add('d-none');
     },
     loading: () => {
       searchButton.disabled = true;
+      input.disabled = true;
       searchButton.innerHTML = 'Loading...';
     },
     invalid: () => {
@@ -44,13 +45,8 @@ const app = () => {
       searchButton.innerHTML = 'Read';
     },
     error: () => {
-      input.disabled = true;
-      searchButton.innerHTML = 'Error';
-      searchButton.disabled = true;
       errorModal.classList.remove('d-none');
-      setTimeout(() => {
-        state.processState = 'init';
-      }, 2500);
+      state.processState = 'init';
     },
   };
 
@@ -82,13 +78,12 @@ const app = () => {
     validateInut(value);
   };
 
+  const handleCloseErrorModal = () => {
+    errorModal.classList.add('d-none');
+  };
+
   const handleSubmit = () => {
     const { value } = input;
-
-    if (!value.length) {
-      state.processState = 'error';
-      return;
-    }
 
     state.processState = 'loading';
 
@@ -98,9 +93,9 @@ const app = () => {
       .get(url)
       .then(({ data }) => {
         const parsed = parse(data);
-        state.processState = 'init';
         state.feed = [...state.feed, parsed];
         state.queryList = [...state.queryList, url];
+        state.processState = 'init';
       })
       .catch(() => {
         state.processState = 'error';
@@ -108,7 +103,7 @@ const app = () => {
   };
 
   const checkForUpdates = () => {
-    setInterval(() => {
+    setTimeout(() => {
       const { queryList, feed } = state;
       const promises = queryList.map(axios.get);
       Promise.all(promises)
@@ -118,13 +113,16 @@ const app = () => {
             const currentFeed = feed[index];
             currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
           });
-        });
+        })
+        .catch(() => {
+          state.processState = 'error';
+        })
+        .finally(checkForUpdates);
     }, checkUpdateInterval);
   };
 
   watch(state, 'feed', () => {
     const { feed } = state;
-
     render(feed);
   });
 
@@ -143,6 +141,10 @@ const app = () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     handleSubmit();
+  });
+
+  closeErrorButton.addEventListener('click', () => {
+    handleCloseErrorModal();
   });
 };
 

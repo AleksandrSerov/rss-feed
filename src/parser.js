@@ -1,4 +1,4 @@
-import uniqid from 'uniqid';
+import _ from 'lodash';
 
 const parser = new DOMParser();
 
@@ -21,7 +21,7 @@ const getItems = (channel) => {
     const title = item.querySelector('title').firstChild.data;
     const link = item.querySelector('link').innerHTML;
     const description = item.querySelector('description').firstChild.data;
-    const id = `modal-${uniqid()}`;
+    const id = _.uniqueId('modal-');
     const uid = getUid(item);
     return {
       title,
@@ -36,7 +36,7 @@ const getItems = (channel) => {
 const getChannelInfo = (channel) => {
   const title = channel.querySelector('title').innerHTML;
   const text = channel.querySelector('description').firstChild.data;
-  const id = uniqid();
+  const id = _.uniqueId('channel-');
   return {
     id,
     title,
