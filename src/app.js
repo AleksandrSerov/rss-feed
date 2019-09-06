@@ -7,12 +7,12 @@ import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 const checkUpdateInterval = 5000;
-const removeErrorTimeout = 2500;
 
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
+const closeErrorButton = document.getElementById('closeErrorButton');
 
 const exampleLinks = document.querySelectorAll('.exampleLink');
 const app = () => {
@@ -28,7 +28,6 @@ const app = () => {
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      errorModal.classList.add('d-none');
     },
     loading: () => {
       searchButton.disabled = true;
@@ -46,13 +45,8 @@ const app = () => {
       searchButton.innerHTML = 'Read';
     },
     error: () => {
-      input.disabled = true;
-      searchButton.innerHTML = 'Error';
-      searchButton.disabled = true;
       errorModal.classList.remove('d-none');
-      setTimeout(() => {
-        state.processState = 'init';
-      }, removeErrorTimeout);
+      state.processState = 'init';
     },
   };
 
@@ -82,6 +76,10 @@ const app = () => {
 
   const handleInput = (value) => {
     validateInut(value);
+  };
+
+  const handleCloseErrorModal = () => {
+    errorModal.classList.add('d-none');
   };
 
   const handleSubmit = () => {
@@ -143,6 +141,10 @@ const app = () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     handleSubmit();
+  });
+
+  closeErrorButton.addEventListener('click', () => {
+    handleCloseErrorModal();
   });
 };
 
