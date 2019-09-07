@@ -7,6 +7,7 @@ import render from './renders';
 
 const corsURL = 'https://cors-anywhere.herokuapp.com';
 const checkUpdateInterval = 5000;
+const errorNoResponseTime = 5000;
 
 const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
@@ -47,6 +48,16 @@ const app = () => {
     error: () => {
       errorModal.classList.remove('d-none');
       state.processState = 'init';
+    },
+    errorNoResponse: () => {
+      input.value = '';
+      input.disabled = false;
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+      errorModal.classList.remove('d-none');
+    },
+    errorNoResponseUpdate: () => {
+      errorModal.classList.remove('d-none');
     },
   };
 
@@ -89,9 +100,17 @@ const app = () => {
 
     const url = `${corsURL}/${value}`;
 
+    const errorNoResponseTimerId = setTimeout(() => {
+      state.processState = 'errorNoResponse';
+    }, errorNoResponseTime);
+
     axios
       .get(url)
       .then(({ data }) => {
+        if (state.processState === 'errorNoResponse') {
+          return;
+        }
+        clearTimeout(errorNoResponseTimerId);
         const parsed = parse(data);
         state.feed = [...state.feed, parsed];
         state.queryList = [...state.queryList, url];
@@ -103,16 +122,35 @@ const app = () => {
   };
 
   const checkForUpdates = () => {
-    setTimeout(() => {
+    const checkUpdateTimerId = setTimeout(() => {
       const { queryList, feed } = state;
+
+      if (!queryList.length) {
+        clearTimeout(checkUpdateTimerId);
+        checkForUpdates();
+        return;
+      }
+
+      const errNoResponseUpdateTimerId = setTimeout(() => {
+        state.processState = 'errorNoResponseUpdate';
+      }, errorNoResponseTime);
+
       const promises = queryList.map(axios.get);
       Promise.all(promises)
-        .then((arr) => arr.map(({ data }) => parse(data)))
-        .then((parsed) => {
-          parsed.forEach(({ items }, index) => {
-            const currentFeed = feed[index];
-            currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
-          });
+        .then((arr) => {
+          if (state.processState === 'errorNoResponseUpdate') {
+            checkForUpdates();
+            return;
+          }
+          clearTimeout(errNoResponseUpdateTimerId);
+
+          arr
+            .map(({ data }) => data)
+            .map(parse)
+            .forEach(({ items }, index) => {
+              const currentFeed = feed[index];
+              currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
+            });
         })
         .catch(() => {
           state.processState = 'error';
