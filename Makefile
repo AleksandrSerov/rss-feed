@@ -3,7 +3,7 @@ install:
 watch:
 	npm run test -- --watch
 test:
-	npm run test -- --coverage
+	npm run test
 lint:
 	npm run lint
 start:
