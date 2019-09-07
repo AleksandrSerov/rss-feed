@@ -14,8 +14,8 @@ const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
 const closeErrorButton = document.getElementById('closeErrorButton');
-
 const exampleLinks = document.querySelectorAll('.exampleLink');
+
 const app = () => {
   const state = {
     processState: null,
