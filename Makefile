@@ -3,9 +3,9 @@ install:
 watch:
 	npm run test -- --watch
 test:
-	npm run test
+	npm test
 lint:
-	npm run lint
+	npx eslint .
 start:
 	npm run start
 build:
