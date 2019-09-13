@@ -15,19 +15,19 @@ const getUid = (item) => {
   return title.innerHTML;
 };
 
-const getItems = (channel) => {
+const getArticles = (channel) => {
   const items = channel.querySelectorAll('item');
   return [...items].map((item) => {
     const title = item.querySelector('title').firstChild.data;
     const link = item.querySelector('link').innerHTML;
     const description = item.querySelector('description').firstChild.data;
-    const id = _.uniqueId('modal-');
+    const articleId = _.uniqueId('article-');
     const uid = getUid(item);
     return {
       title,
       link,
       uid,
-      id,
+      articleId,
       description,
     };
   });
@@ -48,7 +48,7 @@ export default (data) => {
   const xml = parser.parseFromString(data, 'text/xml');
   const channel = xml.querySelector('channel');
   const channelInfo = getChannelInfo(channel);
-  const items = getItems(channel);
+  const items = getArticles(channel);
   return {
     ...channelInfo,
     items,

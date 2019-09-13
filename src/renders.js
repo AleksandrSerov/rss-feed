@@ -21,9 +21,9 @@ const getChannel = (feedItem) => {
   return dom;
 };
 
-const getModal = (description, id) => {
+const getModal = (description, articleId) => {
   const html = `
-  <div class="modal fade" id="${id}" tabindex="-1" role="dialog" aria-labelledby="example" aria-hidden="true">
+  <div class="modal fade" id="${articleId}" tabindex="-1" role="dialog" aria-labelledby="example" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -49,24 +49,25 @@ const getModal = (description, id) => {
 };
 
 const getArticle = (item, modalsListId) => {
-  const { title, link, id: modalId, description } = item;
+  const { title, link, articleId, description } = item;
+
   const html = `
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">
         <a class="card-link" href="${link}">${title}</a><br/>
       </h5>
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#${modalId}">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#${articleId}">
         Read description
       </button>
     </div>
   </div>
   `;
 
-  const modal = getModal(description, modalId);
+  const modal = getModal(description, articleId);
 
   const modalsList = document.getElementById(modalsListId);
-  const isModalExist = modalsList.querySelector(`#${modalId}`);
+  const isModalExist = modalsList.querySelector(`#${articleId}`);
 
   if (!isModalExist) {
     modalsList.appendChild(modal);
@@ -77,15 +78,15 @@ const getArticle = (item, modalsListId) => {
   return dom;
 };
 
-const getArticlesList = (feed, modalsListId, articlesListId) => {
-  const { items, id } = feed;
+const getArticlesList = (feedItem, modalsListId, articlesListId) => {
+  const { items, channelId } = feedItem;
   const articlesList = document.getElementById(articlesListId);
 
   const isEmptyList = !articlesList.innerHTML.length;
   const html = `
   <div class="tab-pane fade ${
     isEmptyList ? 'show active' : ''
-  }" id="list-${id}" role="tabpanel">
+  }" id="list-${channelId}" role="tabpanel">
   </div>
   `;
 
@@ -112,13 +113,13 @@ const renderChannel = (feedItem, channelsListId) => {
   channelsList.appendChild(channel);
 };
 
-const renderArticlesList = (item, modalsListId, articlesListId) => {
-  const { id, items } = item;
+const renderArticlesList = (feedItem, modalsListId, articlesListId) => {
+  const { channelId, items } = feedItem;
   const articlesList = document.getElementById(articlesListId);
 
-  const articleList = articlesList.querySelector(`#list-${id}`);
+  const articleList = articlesList.querySelector(`#list-${channelId}`);
   if (!articleList) {
-    const list = getArticlesList(item, modalsListId, articlesListId);
+    const list = getArticlesList(feedItem, modalsListId, articlesListId);
     articlesList.appendChild(list);
     return;
   }
