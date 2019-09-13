@@ -112,7 +112,7 @@ const renderChannel = (item, channelsListId) => {
   channelsList.appendChild(channel);
 };
 
-const renderList = (item, modalsListId, articlesListId) => {
+const renderArticlesList = (item, modalsListId, articlesListId) => {
   const { id, items } = item;
   const articlesList = document.getElementById(articlesListId);
 
@@ -134,6 +134,6 @@ export default (state) => {
 
   feed.forEach((item) => {
     renderChannel(item, channelsListId);
-    renderList(item, modalsListId, articlesListId);
+    renderArticlesList(item, modalsListId, articlesListId);
   });
 };
