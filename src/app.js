@@ -9,7 +9,6 @@ const corsURL = 'https://cors-anywhere.herokuapp.com';
 const checkUpdateInterval = 5000;
 const errorNoResponseTime = 5000;
 
-const form = document.getElementById('mainForm');
 const input = document.getElementById('formInput');
 const searchButton = document.getElementById('searchButton');
 const errorModal = document.getElementById('errorModal');
@@ -18,6 +17,12 @@ const exampleLinks = document.querySelectorAll('.exampleLink');
 
 const app = () => {
   const state = {
+    layout: {
+      formId: 'mainForm',
+    },
+    articlesListId: 'articlesList',
+    channelsListId: 'channelsList',
+    modalsListId: 'modalsList',
     processState: null,
     queryList: [],
     feed: [],
@@ -160,8 +165,7 @@ const app = () => {
   };
 
   watch(state, 'feed', () => {
-    const { feed } = state;
-    render(feed);
+    render(state);
   });
 
   watch(state, 'processState', () => {
@@ -176,6 +180,7 @@ const app = () => {
     handleInput(e.target.value);
   });
 
+  const form = document.getElementById(state.layout.formId);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     handleSubmit();
