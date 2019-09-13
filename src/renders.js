@@ -5,10 +5,10 @@ const htmlToElement = (html) => {
 };
 
 const getChannel = (feedItem) => {
-  const { title, text, id } = feedItem;
+  const { title, text, channelId } = feedItem;
 
   const html = `
-    <a class="list-group-item list-group-item-action" data-toggle="list" href="#list-${id}" id="${id}" role="tab">
+    <a class="list-group-item list-group-item-action" data-toggle="list" href="#list-${channelId}" id="${channelId}" role="tab">
       <div class="card-body">
         <h5 class="card-title">${title}</h5>
         <p class="card-text">${text}</p>
@@ -94,17 +94,17 @@ const getArticlesList = (feed, modalsListId, articlesListId) => {
   return dom;
 };
 
-const renderChannel = (item, channelsListId) => {
-  const { id } = item;
+const renderChannel = (feedItem, channelsListId) => {
+  const { channelId } = feedItem;
   const channelsList = document.getElementById(channelsListId);
 
-  const isChannelExist = channelsList.querySelector(`#${id}`);
+  const isChannelExist = channelsList.querySelector(`#${channelId}`);
   if (isChannelExist) {
     return;
   }
 
   const isEmptyList = !channelsList.innerHTML.length;
-  const channel = getChannel(item);
+  const channel = getChannel(feedItem);
   if (isEmptyList) {
     channel.classList.add('active');
   }

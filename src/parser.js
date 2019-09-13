@@ -36,9 +36,9 @@ const getItems = (channel) => {
 const getChannelInfo = (channel) => {
   const title = channel.querySelector('title').innerHTML;
   const text = channel.querySelector('description').firstChild.data;
-  const id = _.uniqueId('channel-');
+  const channelId = _.uniqueId('channel-');
   return {
-    id,
+    channelId,
     title,
     text,
   };
