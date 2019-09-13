@@ -132,8 +132,8 @@ const renderArticlesList = (item, modalsListId, articlesListId) => {
 export default (state) => {
   const { feed, modalsListId, articlesListId, channelsListId } = state;
 
-  feed.forEach((item) => {
-    renderChannel(item, channelsListId);
-    renderArticlesList(item, modalsListId, articlesListId);
+  feed.forEach((feedItem) => {
+    renderChannel(feedItem, channelsListId);
+    renderArticlesList(feedItem, modalsListId, articlesListId);
   });
 };
