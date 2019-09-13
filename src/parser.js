@@ -48,9 +48,9 @@ export default (data) => {
   const xml = parser.parseFromString(data, 'text/xml');
   const channel = xml.querySelector('channel');
   const channelInfo = getChannelInfo(channel);
-  const items = getArticles(channel);
+  const articles = getArticles(channel);
   return {
     ...channelInfo,
-    items,
+    articles,
   };
 };
