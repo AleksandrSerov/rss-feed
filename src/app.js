@@ -23,7 +23,7 @@ const app = () => {
     articlesListId: 'articlesList',
     channelsListId: 'channelsList',
     modalsListId: 'modalsList',
-    processState: null,
+    processState: 'init',
     queryList: [],
     feed: [],
   };
@@ -174,7 +174,6 @@ const app = () => {
   });
 
   checkForUpdates();
-  state.processState = 'init';
 
   input.addEventListener('input', (e) => {
     handleInput(e.target.value);
