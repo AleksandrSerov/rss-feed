@@ -79,7 +79,7 @@ const getArticle = (item, modalsListId) => {
 };
 
 const getArticlesList = (feedItem, modalsListId, articlesListId) => {
-  const { items, channelId } = feedItem;
+  const { articles, channelId } = feedItem;
   const articlesList = document.getElementById(articlesListId);
 
   const isEmptyList = !articlesList.innerHTML.length;
@@ -91,7 +91,7 @@ const getArticlesList = (feedItem, modalsListId, articlesListId) => {
   `;
 
   const dom = htmlToElement(html);
-  items.forEach((item) => dom.append(getArticle(item, modalsListId)));
+  articles.forEach((article) => dom.append(getArticle(article, modalsListId)));
   return dom;
 };
 
@@ -114,7 +114,7 @@ const renderChannel = (feedItem, channelsListId) => {
 };
 
 const renderArticlesList = (feedItem, modalsListId, articlesListId) => {
-  const { channelId, items } = feedItem;
+  const { channelId, articles } = feedItem;
   const articlesList = document.getElementById(articlesListId);
 
   const articleList = articlesList.querySelector(`#list-${channelId}`);
@@ -125,7 +125,7 @@ const renderArticlesList = (feedItem, modalsListId, articlesListId) => {
   }
 
   articleList.innerHTML = '';
-  items
+  articles
     .map((articleItem) => getArticle(articleItem, modalsListId))
     .forEach((article) => articleList.append(article));
 };
