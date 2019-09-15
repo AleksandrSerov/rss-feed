@@ -24,6 +24,7 @@ const app = () => {
     channelsListId: 'channelsList',
     modalsListId: 'modalsList',
     processState: 'init',
+    query: '',
     queryList: [],
     feed: [],
     error: {
@@ -79,10 +80,13 @@ const app = () => {
     },
   };
 
-  const validateInut = (value) => {
-    const { queryList } = state;
+  const validateInut = () => {
+    const { query, queryList } = state;
 
-    if (!isURL(value) || queryList.includes(`${corsURL}/${value}`)) {
+    if (
+      query.length &&
+      (!isURL(query) || queryList.includes(`${corsURL}/${query}`))
+    ) {
       state.processState = 'invalid';
       return;
     }
@@ -99,12 +103,13 @@ const app = () => {
         return;
       }
       input.value = value;
-      validateInut(value);
+      state.query = value;
     });
   });
 
   const handleInput = (value) => {
-    validateInut(value);
+    state.query = value;
+    console.log(state);
   };
 
   const handleCloseErrorModal = () => {
@@ -114,11 +119,11 @@ const app = () => {
   };
 
   const handleSubmit = () => {
-    const { value } = input;
+    const { query } = state;
 
     state.processState = 'loading';
 
-    const url = `${corsURL}/${value}`;
+    const url = `${corsURL}/${query}`;
 
     const errorNoResponseTimerId = setTimeout(() => {
       state.processState = 'errorNoResponse';
@@ -191,6 +196,10 @@ const app = () => {
   watch(state, 'error', () => {
     const { processState } = state.error;
     errorModalStates[processState]();
+  });
+
+  watch(state, 'query', () => {
+    validateInut();
   });
 
   checkForUpdates();
