@@ -8,7 +8,7 @@ import render from './renders';
 const app = (doc) => {
   const corsURL = 'https://cors-anywhere.herokuapp.com';
   const checkUpdateInterval = 5000;
-  const errorNoResponseTime = 5000;
+  const errorNoResponseTime = 1;
 
   const state = {
     layout: {
@@ -203,25 +203,27 @@ const app = (doc) => {
     }, checkUpdateInterval);
   };
 
+  checkForUpdates();
+
   watch(state, 'feed', () => {
     render(state, doc);
   });
 
   watch(state, 'processState', () => {
     const { processState } = state;
+
     formStates[processState]();
   });
 
   watch(state, 'error', () => {
     const { processState } = state.error;
+
     errorModalStates[processState]();
   });
 
   watch(state, 'query', () => {
     validateInut();
   });
-
-  checkForUpdates();
 
   input.addEventListener('input', (e) => {
     handleInput(e.target.value);
