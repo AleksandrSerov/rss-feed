@@ -5,20 +5,19 @@ import { watch } from 'melanke-watchjs';
 import parse from './parser';
 import render from './renders';
 
-const corsURL = 'https://cors-anywhere.herokuapp.com';
-const checkUpdateInterval = 5000;
-const errorNoResponseTime = 5000;
+const app = (doc) => {
+  const corsURL = 'https://cors-anywhere.herokuapp.com';
+  const checkUpdateInterval = 5000;
+  const errorNoResponseTime = 5000;
 
-const input = document.getElementById('formInput');
-const searchButton = document.getElementById('searchButton');
-const errorModal = document.getElementById('errorModal');
-const closeErrorButton = document.getElementById('closeErrorButton');
-const exampleLinks = document.querySelectorAll('.exampleLink');
-
-const app = () => {
   const state = {
     layout: {
       formId: 'mainForm',
+      inputId: 'formInput',
+      searchButtonId: 'searchButton',
+      errorModalId: 'errorModal',
+      closeErrorButtonId: 'closeErrorButton',
+      exampleLinkClass: 'exampleLink',
     },
     articlesListId: 'articlesList',
     channelsListId: 'channelsList',
@@ -31,6 +30,22 @@ const app = () => {
       processState: 'hide',
     },
   };
+
+  const {
+    formId,
+    inputId,
+    searchButtonId,
+    errorModalId,
+    closeErrorButtonId,
+    exampleLinkClass,
+  } = state.layout;
+
+  const form = doc.getElementById(formId);
+  const input = doc.getElementById(inputId);
+  const searchButton = doc.getElementById(searchButtonId);
+  const errorModal = doc.getElementById(errorModalId);
+  const closeErrorButton = doc.getElementById(closeErrorButtonId);
+  const exampleLinks = doc.getElementsByClassName(exampleLinkClass);
 
   const formStates = {
     init: () => {
@@ -94,7 +109,7 @@ const app = () => {
     state.processState = 'valid';
   };
 
-  exampleLinks.forEach((link) => {
+  [...exampleLinks].forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
 
@@ -109,7 +124,6 @@ const app = () => {
 
   const handleInput = (value) => {
     state.query = value;
-    console.log(state);
   };
 
   const handleCloseErrorModal = () => {
@@ -208,7 +222,6 @@ const app = () => {
     handleInput(e.target.value);
   });
 
-  const form = document.getElementById(state.layout.formId);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     handleSubmit();
