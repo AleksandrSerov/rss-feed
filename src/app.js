@@ -50,6 +50,7 @@ const app = (doc) => {
   const formStates = {
     init: () => {
       input.value = '';
+      state.query = '';
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
