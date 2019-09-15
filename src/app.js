@@ -186,9 +186,13 @@ const app = (doc) => {
           arr
             .map(({ data }) => data)
             .map(parse)
-            .forEach(({ items }, index) => {
+            .forEach(({ articles }, index) => {
               const currentFeed = feed[index];
-              currentFeed.items = _.unionBy(currentFeed.items, items, 'uid');
+              currentFeed.articles = _.unionBy(
+                currentFeed.articles,
+                articles,
+                'uid',
+              );
             });
         })
         .catch(() => {
