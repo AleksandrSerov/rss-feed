@@ -26,6 +26,9 @@ const app = () => {
     processState: 'init',
     queryList: [],
     feed: [],
+    error: {
+      processState: 'hide',
+    },
   };
 
   const formStates = {
@@ -51,18 +54,28 @@ const app = () => {
       searchButton.innerHTML = 'Read';
     },
     error: () => {
-      errorModal.classList.remove('d-none');
-      state.processState = 'init';
-    },
-    errorNoResponse: () => {
-      input.value = '';
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      errorModal.classList.remove('d-none');
+      state.error.processState = 'show';
+    },
+    errorNoResponse: () => {
+      input.disabled = false;
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+      state.error.processState = 'show';
     },
     errorNoResponseUpdate: () => {
+      state.error.processState = 'show';
+    },
+  };
+
+  const errorModalStates = {
+    show: () => {
       errorModal.classList.remove('d-none');
+    },
+    hide: () => {
+      errorModal.classList.add('d-none');
     },
   };
 
@@ -95,7 +108,9 @@ const app = () => {
   };
 
   const handleCloseErrorModal = () => {
-    errorModal.classList.add('d-none');
+    const { error } = state;
+
+    error.processState = 'hide';
   };
 
   const handleSubmit = () => {
@@ -171,6 +186,11 @@ const app = () => {
   watch(state, 'processState', () => {
     const { processState } = state;
     formStates[processState]();
+  });
+
+  watch(state, 'error', () => {
+    const { processState } = state.error;
+    errorModalStates[processState]();
   });
 
   checkForUpdates();
