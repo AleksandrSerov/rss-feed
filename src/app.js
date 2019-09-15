@@ -5,7 +5,7 @@ import { watch } from 'melanke-watchjs';
 import parse from './parser';
 import render from './renders';
 
-const app = (doc) => {
+export default (doc) => {
   const corsURL = 'https://cors-anywhere.herokuapp.com';
   const checkUpdateInterval = 5000;
   const errorNoResponseTime = 5000;
@@ -239,5 +239,3 @@ const app = (doc) => {
     handleCloseErrorModal();
   });
 };
-
-export default app;
