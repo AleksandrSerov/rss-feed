@@ -203,7 +203,7 @@ const app = (doc) => {
   };
 
   watch(state, 'feed', () => {
-    render(state);
+    render(state, doc);
   });
 
   watch(state, 'processState', () => {

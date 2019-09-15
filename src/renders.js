@@ -1,10 +1,10 @@
-const htmlToElement = (html) => {
-  const template = document.createElement('template');
+const htmlToElement = (html, doc) => {
+  const template = doc.createElement('template');
   template.innerHTML = html.trim();
   return template.content.firstChild;
 };
 
-const getChannel = (feedItem) => {
+const getChannel = (feedItem, doc) => {
   const { title, text, channelId } = feedItem;
 
   const html = `
@@ -16,12 +16,12 @@ const getChannel = (feedItem) => {
     </a>
   `;
 
-  const dom = htmlToElement(html);
+  const dom = htmlToElement(html, doc);
 
   return dom;
 };
 
-const getModal = (description, articleId) => {
+const getModal = (description, articleId, doc) => {
   const html = `
   <div class="modal fade" id="${articleId}" tabindex="-1" role="dialog" aria-labelledby="example" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -43,12 +43,12 @@ const getModal = (description, articleId) => {
     </div>
   `;
 
-  const dom = htmlToElement(html);
+  const dom = htmlToElement(html, doc);
 
   return dom;
 };
 
-const getArticle = (item, modalsListId) => {
+const getArticle = (item, modalsListId, doc) => {
   const { title, link, articleId, description } = item;
 
   const html = `
@@ -64,23 +64,23 @@ const getArticle = (item, modalsListId) => {
   </div>
   `;
 
-  const modal = getModal(description, articleId);
+  const modal = getModal(description, articleId, doc);
 
-  const modalsList = document.getElementById(modalsListId);
+  const modalsList = doc.getElementById(modalsListId);
   const isModalExist = modalsList.querySelector(`#${articleId}`);
 
   if (!isModalExist) {
     modalsList.appendChild(modal);
   }
 
-  const dom = htmlToElement(html);
+  const dom = htmlToElement(html, doc);
 
   return dom;
 };
 
-const getArticlesList = (feedItem, modalsListId, articlesListId) => {
+const getArticlesList = (feedItem, modalsListId, articlesListId, doc) => {
   const { articles, channelId } = feedItem;
-  const articlesList = document.getElementById(articlesListId);
+  const articlesList = doc.getElementById(articlesListId);
 
   const isEmptyList = !articlesList.innerHTML.length;
   const html = `
@@ -90,14 +90,16 @@ const getArticlesList = (feedItem, modalsListId, articlesListId) => {
   </div>
   `;
 
-  const dom = htmlToElement(html);
-  articles.forEach((article) => dom.append(getArticle(article, modalsListId)));
+  const dom = htmlToElement(html, doc);
+  articles.forEach((article) =>
+    dom.append(getArticle(article, modalsListId, doc)),
+  );
   return dom;
 };
 
-const renderChannel = (feedItem, channelsListId) => {
+const renderChannel = (feedItem, channelsListId, doc) => {
   const { channelId } = feedItem;
-  const channelsList = document.getElementById(channelsListId);
+  const channelsList = doc.getElementById(channelsListId);
 
   const isChannelExist = channelsList.querySelector(`#${channelId}`);
   if (isChannelExist) {
@@ -105,7 +107,7 @@ const renderChannel = (feedItem, channelsListId) => {
   }
 
   const isEmptyList = !channelsList.innerHTML.length;
-  const channel = getChannel(feedItem);
+  const channel = getChannel(feedItem, doc);
   if (isEmptyList) {
     channel.classList.add('active');
   }
@@ -113,9 +115,9 @@ const renderChannel = (feedItem, channelsListId) => {
   channelsList.appendChild(channel);
 };
 
-const renderArticlesList = (feedItem, modalsListId, articlesListId) => {
+const renderArticlesList = (feedItem, modalsListId, articlesListId, doc) => {
   const { channelId, articles } = feedItem;
-  const articlesList = document.getElementById(articlesListId);
+  const articlesList = doc.getElementById(articlesListId);
 
   const articleList = articlesList.querySelector(`#list-${channelId}`);
   if (!articleList) {
@@ -126,15 +128,15 @@ const renderArticlesList = (feedItem, modalsListId, articlesListId) => {
 
   articleList.innerHTML = '';
   articles
-    .map((articleItem) => getArticle(articleItem, modalsListId))
+    .map((articleItem) => getArticle(articleItem, modalsListId, doc))
     .forEach((article) => articleList.append(article));
 };
 
-export default (state) => {
+export default (state, doc) => {
   const { feed, modalsListId, articlesListId, channelsListId } = state;
 
   feed.forEach((feedItem) => {
-    renderChannel(feedItem, channelsListId);
-    renderArticlesList(feedItem, modalsListId, articlesListId);
+    renderChannel(feedItem, channelsListId, doc);
+    renderArticlesList(feedItem, modalsListId, articlesListId, doc);
   });
 };
