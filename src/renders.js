@@ -121,7 +121,7 @@ const renderArticlesList = (feedItem, modalsListId, articlesListId, doc) => {
 
   const articleList = articlesList.querySelector(`#list-${channelId}`);
   if (!articleList) {
-    const list = getArticlesList(feedItem, modalsListId, articlesListId);
+    const list = getArticlesList(feedItem, modalsListId, articlesListId, doc);
     articlesList.appendChild(list);
     return;
   }
