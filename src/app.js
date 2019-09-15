@@ -98,10 +98,11 @@ const app = (doc) => {
   const validateInut = () => {
     const { query, queryList } = state;
 
-    if (
-      query.length &&
-      (!isURL(query) || queryList.includes(`${corsURL}/${query}`))
-    ) {
+    const isURLQuery = isURL(query);
+    const isQueryListIncludesQuery = queryList.includes(`${corsURL}/${query}`);
+    const isEmptyQuery = !query.length;
+
+    if (!isEmptyQuery && (!isURLQuery || isQueryListIncludesQuery)) {
       state.processState = 'invalid';
       return;
     }
