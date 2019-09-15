@@ -8,7 +8,7 @@ import render from './renders';
 const app = (doc) => {
   const corsURL = 'https://cors-anywhere.herokuapp.com';
   const checkUpdateInterval = 5000;
-  const errorNoResponseTime = 1;
+  const errorNoResponseTime = 5000;
 
   const state = {
     layout: {
