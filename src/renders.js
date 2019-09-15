@@ -133,7 +133,10 @@ const renderArticlesList = (feedItem, modalsListId, articlesListId, doc) => {
 };
 
 export default (state, doc) => {
-  const { feed, modalsListId, articlesListId, channelsListId } = state;
+  const {
+    feed,
+    layout: { modalsListId, articlesListId, channelsListId },
+  } = state;
 
   feed.forEach((feedItem) => {
     renderChannel(feedItem, channelsListId, doc);
