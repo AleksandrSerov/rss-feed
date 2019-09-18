@@ -10,18 +10,19 @@ export default (doc) => {
   const checkUpdateInterval = 5000;
   const errorNoResponseTime = 5000;
 
+  const layout = {
+    formId: 'mainForm',
+    inputId: 'formInput',
+    searchButtonId: 'searchButton',
+    errorModalId: 'errorModal',
+    closeErrorButtonId: 'closeErrorButton',
+    articlesListId: 'articlesList',
+    channelsListId: 'channelsList',
+    modalsListId: 'modalsList',
+    exampleLinkClass: 'exampleLink',
+  };
+
   const state = {
-    layout: {
-      formId: 'mainForm',
-      inputId: 'formInput',
-      searchButtonId: 'searchButton',
-      errorModalId: 'errorModal',
-      closeErrorButtonId: 'closeErrorButton',
-      articlesListId: 'articlesList',
-      channelsListId: 'channelsList',
-      modalsListId: 'modalsList',
-      exampleLinkClass: 'exampleLink',
-    },
     processState: 'init',
     query: '',
     queryList: [],
@@ -38,7 +39,7 @@ export default (doc) => {
     errorModalId,
     closeErrorButtonId,
     exampleLinkClass,
-  } = state.layout;
+  } = layout;
 
   const form = doc.getElementById(formId);
   const input = doc.getElementById(inputId);
