@@ -23,12 +23,12 @@ export default (doc) => {
   };
 
   const state = {
-    processState: 'init',
+    formState: 'init',
     query: '',
     queryList: [],
     feed: [],
     error: {
-      processState: 'hide',
+      errorState: 'hide',
     },
   };
 
@@ -75,16 +75,16 @@ export default (doc) => {
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      state.error.processState = 'show';
+      state.error.errorState = 'show';
     },
     errorNoResponse: () => {
       input.disabled = false;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
-      state.error.processState = 'show';
+      state.error.errorState = 'show';
     },
     errorNoResponseUpdate: () => {
-      state.error.processState = 'show';
+      state.error.errorState = 'show';
     },
   };
 
@@ -97,19 +97,29 @@ export default (doc) => {
     },
   };
 
-  const validateInut = () => {
-    const { query, queryList } = state;
+  const hasValidInput = (value, queryList) => {
+    const isURLQuery = isURL(value);
+    const isQueryListIncludesValue = queryList.includes(value);
+    const isEmptyValue = !value.length;
 
-    const isURLQuery = isURL(query);
-    const isQueryListIncludesQuery = queryList.includes(`${corsURL}/${query}`);
-    const isEmptyQuery = !query.length;
+    if (!isEmptyValue && (!isURLQuery || isQueryListIncludesValue)) {
+      return false;
+    }
 
-    if (!isEmptyQuery && (!isURLQuery || isQueryListIncludesQuery)) {
-      state.processState = 'invalid';
+    return true;
+  };
+
+  const handleInput = (value) => {
+    const { queryList } = state;
+
+    const isValidInput = hasValidInput(value, queryList);
+    if (!isValidInput) {
+      state.formState = 'invalid';
       return;
     }
 
-    state.processState = 'valid';
+    state.formState = 'valid';
+    state.query = value;
   };
 
   [...exampleLinks].forEach((link) => {
@@ -117,49 +127,45 @@ export default (doc) => {
       e.preventDefault();
 
       const value = e.target.href;
-      if (state.processState === 'loading') {
+      if (state.formState === 'loading') {
         return;
       }
       input.value = value;
-      state.query = value;
+      handleInput(value);
     });
   });
-
-  const handleInput = (value) => {
-    state.query = value;
-  };
 
   const handleCloseErrorModal = () => {
     const { error } = state;
 
-    error.processState = 'hide';
+    error.errorState = 'hide';
   };
 
   const handleSubmit = () => {
     const { query } = state;
 
-    state.processState = 'loading';
+    state.formState = 'loading';
 
     const url = `${corsURL}/${query}`;
 
     const errorNoResponseTimerId = setTimeout(() => {
-      state.processState = 'errorNoResponse';
+      state.formState = 'errorNoResponse';
     }, errorNoResponseTime);
 
     axios
       .get(url)
       .then(({ data }) => {
-        if (state.processState === 'errorNoResponse') {
+        if (state.formState === 'errorNoResponse') {
           return;
         }
         clearTimeout(errorNoResponseTimerId);
         const parsed = parse(data);
         state.feed = [...state.feed, parsed];
-        state.queryList = [...state.queryList, url];
-        state.processState = 'init';
+        state.queryList = [...state.queryList, query];
+        state.formState = 'init';
       })
       .catch(() => {
-        state.processState = 'error';
+        state.formState = 'error';
       });
   };
 
@@ -174,13 +180,15 @@ export default (doc) => {
       }
 
       const errNoResponseUpdateTimerId = setTimeout(() => {
-        state.processState = 'errorNoResponseUpdate';
+        state.formState = 'errorNoResponseUpdate';
       }, errorNoResponseTime);
 
-      const promises = queryList.map(axios.get);
+      const promises = queryList
+        .map((query) => `${corsURL}/${query}`)
+        .map(axios.get);
       Promise.all(promises)
         .then((arr) => {
-          if (state.processState === 'errorNoResponseUpdate') {
+          if (state.formState === 'errorNoResponseUpdate') {
             checkForUpdates();
             return;
           }
@@ -199,7 +207,7 @@ export default (doc) => {
             });
         })
         .catch(() => {
-          state.processState = 'error';
+          state.formState = 'error';
         })
         .finally(checkForUpdates);
     }, checkUpdateInterval);
@@ -211,20 +219,16 @@ export default (doc) => {
     render(state, doc, layout);
   });
 
-  watch(state, 'processState', () => {
-    const { processState } = state;
+  watch(state, 'formState', () => {
+    const { formState } = state;
 
-    formStates[processState]();
+    formStates[formState]();
   });
 
   watch(state, 'error', () => {
-    const { processState } = state.error;
+    const { errorState } = state.error;
 
-    errorModalStates[processState]();
-  });
-
-  watch(state, 'query', () => {
-    validateInut();
+    errorModalStates[errorState]();
   });
 
   input.addEventListener('input', (e) => {
