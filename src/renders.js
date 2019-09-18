@@ -1,8 +1,6 @@
-export default (state, doc) => {
-  const {
-    feed,
-    layout: { modalsListId, articlesListId, channelsListId },
-  } = state;
+export default (state, doc, layout) => {
+  const { feed } = state;
+  const { modalsListId, articlesListId, channelsListId } = layout;
 
   const articlesList = doc.getElementById(articlesListId);
   const channelsList = doc.getElementById(channelsListId);

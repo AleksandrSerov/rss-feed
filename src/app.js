@@ -208,7 +208,7 @@ export default (doc) => {
   checkForUpdates();
 
   watch(state, 'feed', () => {
-    render(state, doc);
+    render(state, doc, layout);
   });
 
   watch(state, 'processState', () => {
