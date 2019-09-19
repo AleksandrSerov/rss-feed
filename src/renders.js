@@ -1,4 +1,60 @@
-export default (state, doc, layout) => {
+export const renderError = (state, doc, layout) => {
+  const { errorState } = state;
+  const { errorModalId } = layout;
+
+  const errorModal = doc.getElementById(errorModalId);
+  const errorStates = {
+    show: () => {
+      errorModal.classList.remove('d-none');
+    },
+    hide: () => {
+      errorModal.classList.add('d-none');
+    },
+  };
+
+  errorStates[errorState]();
+};
+
+export const renderForm = (state, doc, layout) => {
+  const { formState } = state;
+  const { inputId, searchButtonId } = layout;
+
+  const input = doc.getElementById(inputId);
+  const searchButton = doc.getElementById(searchButtonId);
+  const formStates = {
+    init: () => {
+      input.value = '';
+      input.disabled = false;
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+    },
+    loading: () => {
+      searchButton.disabled = true;
+      input.disabled = true;
+      searchButton.innerHTML = 'Loading...';
+    },
+    loaded: () => {
+      searchButton.disabled = false;
+      input.disabled = false;
+      searchButton.innerHTML = 'Read';
+      input.value = '';
+    },
+    invalid: () => {
+      searchButton.disabled = true;
+      searchButton.innerHTML = 'Invalid query';
+      input.classList.add('border-danger');
+    },
+    valid: () => {
+      input.classList.remove('border-danger');
+      searchButton.disabled = false;
+      searchButton.innerHTML = 'Read';
+    },
+  };
+
+  formStates[formState]();
+};
+
+export const renderFeed = (state, doc, layout) => {
   const { feed } = state;
   const { modalsListId, articlesListId, channelsListId } = layout;
 
