@@ -116,7 +116,8 @@ export default (doc) => {
     const checkUpdateTimerId = setTimeout(() => {
       const { queryList, feed } = state;
 
-      if (!queryList.length) {
+      const isEmptyQueryList = !queryList.length;
+      if (isEmptyQueryList) {
         clearTimeout(checkUpdateTimerId);
         checkForUpdates();
         return;
