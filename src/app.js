@@ -37,12 +37,11 @@ export default (doc) => {
   const closeErrorButton = doc.getElementById(closeErrorButtonId);
   const exampleLinks = doc.getElementsByClassName(exampleLinkClass);
 
-  const hasValidInput = (value, queryList) => {
+  const hasValidInput = (value) => {
     const isURLQuery = isURL(value);
-    const isQueryListIncludesValue = queryList.includes(value);
     const isEmptyValue = !value.length;
 
-    if (!isEmptyValue && (!isURLQuery || isQueryListIncludesValue)) {
+    if (!isEmptyValue && !isURLQuery) {
       return false;
     }
 
@@ -52,8 +51,10 @@ export default (doc) => {
   const handleInput = (value) => {
     const { queryList } = state;
 
-    const isValidInput = hasValidInput(value, queryList);
-    if (!isValidInput) {
+    const isValidInput = hasValidInput(value);
+    const isQueryListIncludesValue = queryList.includes(value);
+
+    if (!isValidInput || isQueryListIncludesValue) {
       state.formState = 'invalid';
       return;
     }
