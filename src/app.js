@@ -3,7 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import { watch } from 'melanke-watchjs';
 import parse from './parser';
-import render from './renders';
+import { renderFeed, renderForm, renderError } from './renders';
 
 export default (doc) => {
   const corsURL = 'https://cors-anywhere.herokuapp.com';
@@ -24,85 +24,24 @@ export default (doc) => {
 
   const state = {
     formState: 'init',
+    feed: [],
+    errorState: 'hide',
     query: '',
     queryList: [],
-    feed: [],
-    error: {
-      errorState: 'hide',
-    },
   };
 
-  const {
-    formId,
-    inputId,
-    searchButtonId,
-    errorModalId,
-    closeErrorButtonId,
-    exampleLinkClass,
-  } = layout;
+  const { formId, inputId, closeErrorButtonId, exampleLinkClass } = layout;
 
   const form = doc.getElementById(formId);
   const input = doc.getElementById(inputId);
-  const searchButton = doc.getElementById(searchButtonId);
-  const errorModal = doc.getElementById(errorModalId);
   const closeErrorButton = doc.getElementById(closeErrorButtonId);
   const exampleLinks = doc.getElementsByClassName(exampleLinkClass);
 
-  const formStates = {
-    init: () => {
-      input.value = '';
-      state.query = '';
-      input.disabled = false;
-      searchButton.disabled = false;
-      searchButton.innerHTML = 'Read';
-    },
-    loading: () => {
-      searchButton.disabled = true;
-      input.disabled = true;
-      searchButton.innerHTML = 'Loading...';
-    },
-    invalid: () => {
-      searchButton.disabled = true;
-      searchButton.innerHTML = 'Invalid query';
-      input.classList.add('border-danger');
-    },
-    valid: () => {
-      input.classList.remove('border-danger');
-      searchButton.disabled = false;
-      searchButton.innerHTML = 'Read';
-    },
-    error: () => {
-      input.disabled = false;
-      searchButton.disabled = false;
-      searchButton.innerHTML = 'Read';
-      state.error.errorState = 'show';
-    },
-    errorNoResponse: () => {
-      input.disabled = false;
-      searchButton.disabled = false;
-      searchButton.innerHTML = 'Read';
-      state.error.errorState = 'show';
-    },
-    errorNoResponseUpdate: () => {
-      state.error.errorState = 'show';
-    },
-  };
-
-  const errorModalStates = {
-    show: () => {
-      errorModal.classList.remove('d-none');
-    },
-    hide: () => {
-      errorModal.classList.add('d-none');
-    },
-  };
-
-  const hasValidInput = (value, queryList) => {
+  const hasValidInput = (value) => {
     const isURLQuery = isURL(value);
-    const isQueryListIncludesValue = queryList.includes(value);
     const isEmptyValue = !value.length;
 
-    if (!isEmptyValue && (!isURLQuery || isQueryListIncludesValue)) {
+    if (!isEmptyValue && !isURLQuery) {
       return false;
     }
 
@@ -112,8 +51,10 @@ export default (doc) => {
   const handleInput = (value) => {
     const { queryList } = state;
 
-    const isValidInput = hasValidInput(value, queryList);
-    if (!isValidInput) {
+    const isValidInput = hasValidInput(value);
+    const isQueryListIncludesValue = queryList.includes(value);
+
+    if (!isValidInput || isQueryListIncludesValue) {
       state.formState = 'invalid';
       return;
     }
@@ -136,9 +77,7 @@ export default (doc) => {
   });
 
   const handleCloseErrorModal = () => {
-    const { error } = state;
-
-    error.errorState = 'hide';
+    state.errorState = 'hide';
   };
 
   const handleSubmit = () => {
@@ -149,23 +88,27 @@ export default (doc) => {
     const url = `${corsURL}/${query}`;
 
     const errorNoResponseTimerId = setTimeout(() => {
-      state.formState = 'errorNoResponse';
+      state.errorState = 'show';
+      state.formState = 'init';
     }, errorNoResponseTime);
 
     axios
       .get(url)
       .then(({ data }) => {
-        if (state.formState === 'errorNoResponse') {
+        if (state.errorState === 'show') {
           return;
         }
         clearTimeout(errorNoResponseTimerId);
+        state.formState = 'loaded';
         const parsed = parse(data);
         state.feed = [...state.feed, parsed];
         state.queryList = [...state.queryList, query];
-        state.formState = 'init';
       })
       .catch(() => {
-        state.formState = 'error';
+        state.errorState = 'show';
+      })
+      .finally(() => {
+        state.formState = 'init';
       });
   };
 
@@ -173,14 +116,15 @@ export default (doc) => {
     const checkUpdateTimerId = setTimeout(() => {
       const { queryList, feed } = state;
 
-      if (!queryList.length) {
+      const isEmptyQueryList = !queryList.length;
+      if (isEmptyQueryList) {
         clearTimeout(checkUpdateTimerId);
         checkForUpdates();
         return;
       }
 
       const errNoResponseUpdateTimerId = setTimeout(() => {
-        state.formState = 'errorNoResponseUpdate';
+        state.errorState = 'show';
       }, errorNoResponseTime);
 
       const promises = queryList
@@ -188,7 +132,7 @@ export default (doc) => {
         .map(axios.get);
       Promise.all(promises)
         .then((arr) => {
-          if (state.formState === 'errorNoResponseUpdate') {
+          if (state.errorState === 'show') {
             checkForUpdates();
             return;
           }
@@ -207,7 +151,7 @@ export default (doc) => {
             });
         })
         .catch(() => {
-          state.formState = 'error';
+          state.errorState = 'show';
         })
         .finally(checkForUpdates);
     }, checkUpdateInterval);
@@ -216,19 +160,15 @@ export default (doc) => {
   checkForUpdates();
 
   watch(state, 'feed', () => {
-    render(state, doc, layout);
+    renderFeed(state, doc, layout);
   });
 
   watch(state, 'formState', () => {
-    const { formState } = state;
-
-    formStates[formState]();
+    renderForm(state, doc, layout);
   });
 
-  watch(state, 'error', () => {
-    const { errorState } = state.error;
-
-    errorModalStates[errorState]();
+  watch(state, 'errorState', () => {
+    renderError(state, doc, layout);
   });
 
   input.addEventListener('input', (e) => {
