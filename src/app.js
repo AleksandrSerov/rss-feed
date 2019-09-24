@@ -23,7 +23,10 @@ export default (doc) => {
   };
 
   const state = {
-    formState: 'init',
+    form: {
+      state: 'init',
+      inputValue: '',
+    },
     feed: [],
     errorState: 'hide',
     query: '',
@@ -55,11 +58,17 @@ export default (doc) => {
     const isQueryListIncludesValue = queryList.includes(value);
 
     if (!isValidInput || isQueryListIncludesValue) {
-      state.formState = 'invalid';
+      state.form = {
+        state: 'invalid',
+        inputValue: value,
+      };
       return;
     }
 
-    state.formState = 'valid';
+    state.form = {
+      state: 'valid',
+      inputValue: value,
+    };
     state.query = value;
   };
 
@@ -68,10 +77,9 @@ export default (doc) => {
       e.preventDefault();
 
       const value = e.target.href;
-      if (state.formState === 'loading') {
+      if (state.form.state === 'loading') {
         return;
       }
-      input.value = value;
       handleInput(value);
     });
   });
@@ -83,13 +91,13 @@ export default (doc) => {
   const handleSubmit = () => {
     const { query } = state;
 
-    state.formState = 'loading';
+    state.form.state = 'loading';
 
     const url = `${corsURL}/${query}`;
 
     const errorNoResponseTimerId = setTimeout(() => {
       state.errorState = 'show';
-      state.formState = 'init';
+      state.form.state = 'init';
     }, errorNoResponseTime);
 
     axios
@@ -99,7 +107,7 @@ export default (doc) => {
           return;
         }
         clearTimeout(errorNoResponseTimerId);
-        state.formState = 'loaded';
+        state.form.state = 'loaded';
         const parsedFeed = parse(data);
         state.feed = [...state.feed, parsedFeed];
         state.queryList = [...state.queryList, query];
@@ -108,7 +116,7 @@ export default (doc) => {
         state.errorState = 'show';
       })
       .finally(() => {
-        state.formState = 'init';
+        state.form.state = 'init';
       });
   };
 
@@ -163,7 +171,7 @@ export default (doc) => {
     renderFeed(state, doc, layout);
   });
 
-  watch(state, 'formState', () => {
+  watch(state, 'form', () => {
     renderForm(state, doc, layout);
   });
 
