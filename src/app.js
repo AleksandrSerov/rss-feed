@@ -100,8 +100,8 @@ export default (doc) => {
         }
         clearTimeout(errorNoResponseTimerId);
         state.formState = 'loaded';
-        const parsed = parse(data);
-        state.feed = [...state.feed, parsed];
+        const parsedFeed = parse(data);
+        state.feed = [...state.feed, parsedFeed];
         state.queryList = [...state.queryList, query];
       })
       .catch(() => {
