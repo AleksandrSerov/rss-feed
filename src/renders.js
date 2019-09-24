@@ -16,7 +16,9 @@ export const renderError = (state, doc, layout) => {
 };
 
 export const renderForm = (state, doc, layout) => {
-  const { formState } = state;
+  const {
+    form: { state: formState, inputValue },
+  } = state;
   const { inputId, searchButtonId } = layout;
 
   const input = doc.getElementById(inputId);
@@ -41,11 +43,13 @@ export const renderForm = (state, doc, layout) => {
     },
     invalid: () => {
       searchButton.disabled = true;
+      input.value = inputValue;
       searchButton.innerHTML = 'Invalid query';
       input.classList.add('border-danger');
     },
     valid: () => {
       input.classList.remove('border-danger');
+      input.value = inputValue;
       searchButton.disabled = false;
       searchButton.innerHTML = 'Read';
     },
