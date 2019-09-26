@@ -4,7 +4,7 @@ export const renderError = (state, doc, layout) => {
 
   const errorModal = doc.getElementById(errorModalId);
   const errorStates = {
-    show: () => {
+    open: () => {
       errorModal.classList.remove('d-none');
     },
     hide: () => {
@@ -189,9 +189,7 @@ export const renderFeed = (state, doc, layout) => {
     }
 
     articleList.innerHTML = '';
-    articles
-      .map((articleItem) => getArticle(articleItem))
-      .forEach((article) => articleList.append(article));
+    articles.map(getArticle).forEach((article) => articleList.append(article));
   };
 
   feed.forEach((feedItem) => {

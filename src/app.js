@@ -96,14 +96,14 @@ export default (doc) => {
     const url = `${corsURL}/${query}`;
 
     const errorNoResponseTimerId = setTimeout(() => {
-      state.errorState = 'show';
+      state.errorState = 'open';
       state.form.state = 'init';
     }, errorNoResponseTime);
 
     axios
       .get(url)
       .then(({ data }) => {
-        if (state.errorState === 'show') {
+        if (state.errorState === 'open') {
           return;
         }
         clearTimeout(errorNoResponseTimerId);
@@ -113,7 +113,7 @@ export default (doc) => {
         state.queryList = [...state.queryList, query];
       })
       .catch(() => {
-        state.errorState = 'show';
+        state.errorState = 'open';
       })
       .finally(() => {
         state.form.state = 'init';
@@ -132,7 +132,7 @@ export default (doc) => {
       }
 
       const errNoResponseUpdateTimerId = setTimeout(() => {
-        state.errorState = 'show';
+        state.errorState = 'open';
       }, errorNoResponseTime);
 
       const promises = queryList
@@ -140,7 +140,7 @@ export default (doc) => {
         .map(axios.get);
       Promise.all(promises)
         .then((arr) => {
-          if (state.errorState === 'show') {
+          if (state.errorState === 'open') {
             checkForUpdates();
             return;
           }
@@ -159,7 +159,7 @@ export default (doc) => {
             });
         })
         .catch(() => {
-          state.errorState = 'show';
+          state.errorState = 'open';
         })
         .finally(checkForUpdates);
     }, checkUpdateInterval);
