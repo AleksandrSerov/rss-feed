@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { watch } from 'melanke-watchjs';
 import parse from './parser';
 import { renderFeed, renderForm, renderError } from './renders';
+import { STATUS_SUCCESS } from './constants';
 
 export default (doc) => {
   const corsURL = 'https://cors-anywhere.herokuapp.com';
@@ -88,7 +89,7 @@ export default (doc) => {
     state.errorState = 'hide';
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { query } = state;
 
     state.form.state = 'loading';
@@ -99,25 +100,25 @@ export default (doc) => {
       state.errorState = 'open';
       state.form.state = 'init';
     }, errorNoResponseTime);
-
-    axios
-      .get(url)
-      .then(({ data }) => {
-        if (state.errorState === 'open') {
-          return;
-        }
-        clearTimeout(errorNoResponseTimerId);
-        state.form.state = 'loaded';
-        const parsedFeed = parse(data);
-        state.feed = [...state.feed, parsedFeed];
-        state.queryList = [...state.queryList, query];
-      })
-      .catch(() => {
+    try {
+      const response = await axios.get(url);
+      if (state.errorState === 'open') {
+        return;
+      }
+      clearTimeout(errorNoResponseTimerId);
+      if (response.status !== STATUS_SUCCESS) {
         state.errorState = 'open';
-      })
-      .finally(() => {
-        state.form.state = 'init';
-      });
+        return;
+      }
+      state.form.state = 'loaded';
+      const { data } = response;
+      const parsedFeed = parse(data);
+      state.feed = [...state.feed, parsedFeed];
+      state.queryList = [...state.queryList, query];
+    } catch (error) {
+      state.errorState = 'open';
+    }
+    state.form.state = 'init';
   };
 
   const checkForUpdates = () => {
