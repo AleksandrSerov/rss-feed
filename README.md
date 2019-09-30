@@ -1,9 +1,8 @@
 # frontend-project-lvl3
 
-[![Build Status](https://travis-ci.org/AleksandrSerov/frontend-project-lvl3.svg?branch=master)](https://travis-ci.org/AleksandrSerov/frontend-project-lvl3)
-[![Maintainability](https://api.codeclimate.com/v1/badges/f69c6e9f499717acfc42/maintainability)](https://codeclimate.com/github/AleksandrSerov/frontend-project-lvl3/maintainability)
-
-<!-- [![Test Coverage](https://api.codeclimate.com/v1/badges/f69c6e9f499717acfc42/test_coverage)](https://codeclimate.com/github/AleksandrSerov/frontend-project-lvl3/test_coverage) -->
+[![Build Status](https://travis-ci.org/AleksandrSerov/rss-feed.svg?branch=master)](https://travis-ci.org/AleksandrSerov/rss-feed)
+[![Maintainability](https://api.codeclimate.com/v1/badges/564aec62d2c69b46d075/maintainability)](https://codeclimate.com/github/AleksandrSerov/rss-feed/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/564aec62d2c69b46d075/test_coverage)](https://codeclimate.com/github/AleksandrSerov/rss-feed/test_coverage)
 
 ## Demo
 
@@ -16,8 +15,8 @@ RSS feeds with automatic updates.
 ## Installation
 
 ```bash
-git clone https://github.com/AleksandrSerov/frontend-project-lvl3.git
-cd frontend-project-lvl-3
+git clone https://github.com/AleksandrSerov/rss-feed.git
+cd rss-feed
 make install
 ```
 
