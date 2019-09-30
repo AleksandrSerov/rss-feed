@@ -1,3 +1,1 @@
-test('mocked tests123', () => {
-  expect().toBe();
-});
+test('example', () => {});

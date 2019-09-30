@@ -1,7 +1,7 @@
 {
-  "name": "frontend-project-lvl3",
+  "name": "rss-feed",
   "version": "1.0.0",
-  "description": "Hexlet frontend-project",
+  "description": "RSS-feed project",
   "scripts": {
     "test": "jest",
     "build": "webpack",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AleksandrSerov/frontend-project-lvl3.git"
+    "url": "git+https://github.com/AleksandrSerov/rss-feed.git"
   },
   "author": "Aleksandr Serov",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AleksandrSerov/frontend-project-lvl3/issues"
+    "url": "https://github.com/AleksandrSerov/rss-feed/issues"
   },
-  "homepage": "https://github.com/AleksandrSerov/frontend-project-lvl3#readme",
+  "homepage": "https://github.com/AleksandrSerov/rss-feed#readme",
   "dependencies": {
     "axios": "^0.19.0",
     "babel-polyfill": "^6.26.0",
