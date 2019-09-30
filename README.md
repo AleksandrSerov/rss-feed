@@ -1,4 +1,4 @@
-# frontend-project-lvl3
+# RSS-feed
 
 [![Build Status](https://travis-ci.org/AleksandrSerov/rss-feed.svg?branch=master)](https://travis-ci.org/AleksandrSerov/rss-feed)
 [![Maintainability](https://api.codeclimate.com/v1/badges/564aec62d2c69b46d075/maintainability)](https://codeclimate.com/github/AleksandrSerov/rss-feed/maintainability)
